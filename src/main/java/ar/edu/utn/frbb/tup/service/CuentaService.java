@@ -1,6 +1,7 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
@@ -26,7 +27,7 @@ public class CuentaService {
     ClienteService clienteService;
 
     public Cuenta darDeAltaCuenta(CuentaDto cuentadto) throws ClienteNotExistException, CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, TipoMonedaNotSupportedException {
-        Cuenta cuenta = cuentaDao.find(cuentadto.getDni());
+        Cuenta cuenta = parsearCuenta(cuentadto);
         
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
@@ -42,8 +43,7 @@ public class CuentaService {
         cuentaDao.save(cuenta);
         return cuenta;
     }
-
-    
+  
 
     // Validaciones de cuenta
     // Valido que cuenta y moneda sean soportadas
@@ -79,4 +79,13 @@ public class CuentaService {
             throw new NotExistCuentaException("Número de cuenta no existe.");
         }
     }
+
+
+    private Cuenta parsearCuenta(CuentaDto cuentaDto) throws ClienteNotExistException {
+        Cuenta cuenta = new Cuenta(cuentaDto);
+        Cliente titular = clienteService.buscarClientePorDni(cuentaDto.getDni());
+        cuenta.setTitular(titular);
+        return cuenta;
+    }
+
 }

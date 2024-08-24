@@ -11,6 +11,7 @@ import ar.edu.utn.frbb.tup.service.CuentaService;
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -30,9 +31,19 @@ public class CuentaController {
 
     // Create a new account
     @PostMapping
-    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto, WebRequest request) throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, TipoMonedaNotSupportedException, ClienteNotExistException {
+    public ResponseEntity<Cuenta> crearCuenta(@RequestBody CuentaDto cuentaDto, WebRequest request) 
+            throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, 
+                TipoCuentaNotSupportedException, TipoMonedaNotSupportedException, 
+                ClienteNotExistException {
+        
+        // Valida el DTO
         cuentaValidator.validate(cuentaDto);
-        return cuentaService.darDeAltaCuenta(cuentaDto);
+        
+        // Crea la cuenta a partir del DTO
+        Cuenta cuenta = cuentaService.darDeAltaCuenta(cuentaDto);
+        
+        // Retorna la cuenta con un estado HTTP 201 (Created)
+        return new ResponseEntity<>(cuenta, HttpStatus.CREATED);
     }
 
     @GetMapping("/{numeroCuenta}")
@@ -42,7 +53,7 @@ public class CuentaController {
     }
 
     @GetMapping("/{idcliente}/cuentas")
-    public List<Cuenta> getCuentasCliente(@PathVariable long id, WebRequest request) {
-        return cuentaService.cuentasdeCliente(id);
+    public List<Cuenta> getCuentasCliente(@PathVariable("idcliente") long idcliente, WebRequest request) {
+        return cuentaService.cuentasdeCliente(idcliente);
     }
 }

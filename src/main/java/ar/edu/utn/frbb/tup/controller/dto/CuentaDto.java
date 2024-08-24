@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.controller.dto;
 
+
 public class CuentaDto {
     private String tipoCuenta;
     private long dni;
@@ -27,5 +28,4 @@ public class CuentaDto {
     public void setTipoCuenta(String tipoCuenta) {
         this.tipoCuenta = tipoCuenta;
     }
-
 }

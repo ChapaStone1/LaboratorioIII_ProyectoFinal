@@ -1,10 +1,13 @@
 package ar.edu.utn.frbb.tup.controller.validator;
 
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import org.springframework.stereotype.Component;
 
-public class GeneralValidator {
+@Component
+public class GeneralValidator {/* 
     public void validarDni(long dni) throws InputErrorException {
         String dniString = String.valueOf(dni);
         if(dniString.length() != 8){
@@ -86,4 +89,5 @@ public class GeneralValidator {
             throw new IllegalArgumentException("El MONTO ingresado no es valido.");
         }
     }  
+*/
 }

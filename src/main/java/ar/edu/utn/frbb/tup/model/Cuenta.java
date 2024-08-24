@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 
 public class Cuenta {
@@ -12,8 +14,11 @@ public class Cuenta {
     LocalDateTime fechaCreacion;
     int balance;
     TipoCuenta tipoCuenta;
-    Cliente titular;
     TipoMoneda moneda;
+
+    @JsonIgnore
+    Cliente titular;
+    @JsonIgnore
     private List<Movimiento> movimientos;
 
     public Cuenta() {
@@ -28,7 +33,10 @@ public class Cuenta {
         this.balance = 0;
         this.fechaCreacion = LocalDateTime.now();
         this.movimientos = new ArrayList<>();
+        this.tipoCuenta = TipoCuenta.fromString(cuentaDto.getTipoCuenta());  // Suponiendo que getTipoCuenta() existe en CuentaDto
+        this.moneda = TipoMoneda.fromString(cuentaDto.getMoneda());          // Suponiendo que getMoneda() existe en CuentaDto
     }
+
     public Cliente getTitular() {
         return titular;
     }
@@ -46,6 +54,21 @@ public class Cuenta {
         this.tipoCuenta = tipoCuenta;
         return this;
     }
+
+    public Cuenta getNumeroCuenta(long numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+        return this;
+    }
+
+    public long getNumeroCuenta() {
+        return numeroCuenta;
+    }
+    
+    public Cuenta setNumeroCuenta(long numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
+        return this;
+    }
+
 
     public TipoMoneda getMoneda() {
         return moneda;
@@ -77,6 +100,8 @@ public class Cuenta {
         this.balance = balance;
         return this;
     }
+    
+
     public List<Movimiento> getMovimientos() {
         return movimientos;
     }
@@ -92,20 +117,11 @@ public class Cuenta {
         this.balance = this.balance - cantidadADebitar;
     }
 
-    public void setNumeroCuenta(long numeroCuenta) {
-        this.numeroCuenta = numeroCuenta;
-    }
+
 
     public void forzaDebitoDeCuenta(int i) {
         this.balance = this.balance - i;
     }
-
-    public long getNumeroCuenta() {
-        return numeroCuenta;
-    }
-
-
-
 
     /* 
 
@@ -140,23 +156,5 @@ public class Cuenta {
         this.movimientos.add(movimiento);
     }
 
-    private int generarIdMovimiento() {
-        return contadorMovimientos++;
-    }
-
-    public void imprimirMovimientos() {
-        for (Movimiento movimiento : movimientos) {
-            movimiento.imprimirMovimiento();
-        }
-    }
-
-    // metodo de imprimir
-
-    public void imprimirCuenta() {
-        System.out.println("     Nombre: " + this.nombre);
-        System.out.println("        Fecha de creacion: " + this.fechaCreacion);
-        System.out.println("        Balance: " + this.balance);
-        System.out.println("        CBU: " + this.CBU);
-    }
 */
 }

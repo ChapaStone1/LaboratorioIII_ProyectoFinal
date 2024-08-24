@@ -1,8 +1,7 @@
 package ar.edu.utn.frbb.tup.service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +20,6 @@ public class MovimientosService {
         if (cuenta == null) {
             throw new NotExistCuentaException("No existe una cuenta con el numero de cuenta: " + cuentaId);
         }
-
         return getMovimientos(cuenta);
     }
 

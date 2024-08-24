@@ -1,10 +1,9 @@
 package ar.edu.utn.frbb.tup.model;
-
 import java.time.LocalDateTime;
 import java.util.Random;
 
 public class Movimiento {
-    private static int contadorId = 0; // Variable estática para llevar la cuenta de los IDs
+    private static int contadorId = 0;
     private int id;
     private LocalDateTime fecha;
     private TipoMovimiento tipo;
@@ -21,12 +20,13 @@ public class Movimiento {
         this.monto = monto;
         this.cuentaOrigen = cuentaOrigen;
         this.cuentaDestino = cuentaDestino;
-        this.descripcion = generarDescripcion(); // Setea la descripción automáticamente
+        this.numTransaccion = generarNumTransaccion();
     }
 
     public Movimiento() {
-        this.id = ++contadorId; // Incrementa y asigna el ID
+        this.id = ++contadorId;
         this.fecha = LocalDateTime.now();
+        this.numTransaccion = generarNumTransaccion();
     }
 
     public long getCuentaDestino() {
@@ -70,50 +70,47 @@ public class Movimiento {
     }
     public void setTipo(TipoMovimiento tipo) {
         this.tipo = tipo;
-        this.descripcion = generarDescripcion(); // Actualiza la descripción si cambia el tipo
     }
 
-    private String generarDescripcion() {
+    public long generarNumTransaccion() {
+        Random random = new Random();
+        return 100000 + random.nextInt(900000);
+    }
+
+    private String generarDescripcion(double monto, TipoMovimiento tipo, long cuentaOrigen, long cuentaDestino) {
         switch (tipo) {
             case RETIRO:
-                return "Retiro";
+                return "Retiro en cuenta: " + cuentaOrigen + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
             case DEPOSITO:
-                return "Depósito";
+                return "Depósito en cuenta: " + cuentaDestino + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
             case TRANSFERENCIA:
-                return "Transferencia";
+                return "Transferencia de cuenta: " + cuentaOrigen + " a cuenta: " + cuentaDestino + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
             default:
                 return "Movimiento desconocido";
         }
     }
 
-    public void guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino, String descripcion) {
+    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino, String descripcion) {
         Movimiento movimiento = new Movimiento(tipo, monto, cuentaOrigen, cuentaDestino);
-        movimiento.setDescripcion(descripcion != null ? descripcion : movimiento.generarDescripcion());
+        movimiento.setDescripcion(descripcion != null ? descripcion : movimiento.generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
 
         switch (tipo) {
             case DEPOSITO:
                 movimiento.setCuentaDestino(cuenta.getNumeroCuenta());
                 break;
-
             case TRANSFERENCIA:
-                movimiento.setCuentaOrigen(cuentaOrigen); // La cuenta de origen es la que se recibe como parámetro
-                movimiento.setCuentaDestino(cuentaDestino); // La cuenta de destino es la que se recibe como parámetro
+                movimiento.setCuentaOrigen(cuentaOrigen);
+                movimiento.setCuentaDestino(cuentaDestino);
                 break;
-
             case RETIRO:
-                movimiento.setMonto(-monto); // El retiro se representa con un monto negativo
-                movimiento.setCuentaOrigen(cuenta.getNumeroCuenta()); // Asumimos que el retiro es desde la cuenta actual
+                movimiento.setMonto(-monto);
+                movimiento.setCuentaOrigen(cuenta.getNumeroCuenta());
                 break;
-
             default:
                 throw new IllegalArgumentException("Tipo de movimiento no válido: " + tipo);
         }
 
         cuenta.agregarMovimiento(movimiento);
-    }
-
-    
-    public void imprimirMovimiento() {
-        System.out.println("Id: " + id + " Fecha: " + fecha + " Tipo: " + tipo + " Monto: " + monto + " CuentaOrigen: " + cuentaOrigen + " CuentaDestino: " + cuentaDestino);
+        return movimiento; // Retorna la instancia de Movimiento
     }
 }
