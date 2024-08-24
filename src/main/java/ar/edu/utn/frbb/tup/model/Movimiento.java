@@ -44,6 +44,9 @@ public class Movimiento {
     public int getId() {
         return id;
     }
+    public long getNumTransaccion() {
+        return numTransaccion;
+    }
     public double getMonto() {
         return monto;
     }
