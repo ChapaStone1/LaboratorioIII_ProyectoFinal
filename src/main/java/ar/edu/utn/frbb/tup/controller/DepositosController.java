@@ -10,7 +10,7 @@ import ar.edu.utn.frbb.tup.service.DepositosService;
 
 
 @RestController
-@RequestMapping("/deposito")
+@RequestMapping("/api/v1/deposito")
 public class DepositosController {
     @Autowired
     private DepositosService depositoService;

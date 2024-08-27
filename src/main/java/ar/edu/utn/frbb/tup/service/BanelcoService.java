@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class BanelcoService {
     public boolean servicioDeBanelco(TransferenciasDto transferenciaDto){
-        return transferenciaDto.getCuentaDestino() % 2 == 0;
+        return transferenciaDto.getCuentaDestino() % 10 == 0;
     }
 }

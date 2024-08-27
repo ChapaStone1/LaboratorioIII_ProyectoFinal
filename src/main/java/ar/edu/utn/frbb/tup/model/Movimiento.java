@@ -14,21 +14,24 @@ public class Movimiento {
     private String descripcion;
 
     public Movimiento(TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
-        this.id = ++contadorId;
         this.fecha = LocalDateTime.now();
         this.tipo = tipo;
         this.monto = monto;
         this.cuentaOrigen = cuentaOrigen;
         this.cuentaDestino = cuentaDestino;
+        this.descripcion = generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino);
         this.numTransaccion = generarNumTransaccion();
     }
 
     public Movimiento() {
-        this.id = ++contadorId;
+       // this.id = id;
         this.fecha = LocalDateTime.now();
-        this.numTransaccion = generarNumTransaccion();
     }
 
+    
+    private static synchronized int generarNuevoId() {
+        return ++contadorId;
+    }
     public long getCuentaDestino() {
         return cuentaDestino;
     }
@@ -75,7 +78,7 @@ public class Movimiento {
         this.tipo = tipo;
     }
 
-    public long generarNumTransaccion() {
+    private long generarNumTransaccion() {
         Random random = new Random();
         return 100000 + random.nextInt(900000);
     }
@@ -83,20 +86,20 @@ public class Movimiento {
     private String generarDescripcion(double monto, TipoMovimiento tipo, long cuentaOrigen, long cuentaDestino) {
         switch (tipo) {
             case RETIRO:
-                return "Retiro en cuenta: " + cuentaOrigen + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
+                return "Retiro en cuenta: " + cuentaOrigen;
             case DEPOSITO:
-                return "Depósito en cuenta: " + cuentaDestino + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
+                return "Depósito en cuenta: " + cuentaDestino;
             case TRANSFERENCIA:
-                return "Transferencia de cuenta: " + cuentaOrigen + " a cuenta: " + cuentaDestino + " - Monto: " + monto + " - Fecha: " + LocalDateTime.now();
+                return "Transferencia de cuenta: " + cuentaOrigen + " a cuenta: " + cuentaDestino;
+            case CONSULTA_MOVIMIENTOS:
+                return "Consulta de movimientos.";
             default:
                 return "Movimiento desconocido";
         }
     }
 
-    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino, String descripcion) {
+    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
         Movimiento movimiento = new Movimiento(tipo, monto, cuentaOrigen, cuentaDestino);
-        movimiento.setDescripcion(descripcion != null ? descripcion : movimiento.generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
-
         switch (tipo) {
             case DEPOSITO:
                 movimiento.setCuentaDestino(cuenta.getNumeroCuenta());
@@ -109,11 +112,16 @@ public class Movimiento {
                 movimiento.setMonto(-monto);
                 movimiento.setCuentaOrigen(cuenta.getNumeroCuenta());
                 break;
+            case CONSULTA_MOVIMIENTOS:
+            // No se realiza ninguna acción para CONSULTA_MOVIMIENTOS
+                break;
             default:
                 throw new IllegalArgumentException("Tipo de movimiento no válido: " + tipo);
         }
-
-        cuenta.agregarMovimiento(movimiento);
+        movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
+        movimiento.setId(generarNuevoId());
+        cuenta.guardarMovimiento(movimiento);
+        
         return movimiento; // Retorna la instancia de Movimiento
     }
 }

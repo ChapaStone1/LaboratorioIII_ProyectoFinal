@@ -79,7 +79,14 @@ public class Cuenta {
         return this;
     }
 
-    public void agregarMovimiento(Movimiento movimiento) {
+    public void setMovimientos(List<Movimiento> movimientos2) {
+        // Asegúrate de que `movimientos2` no sea nulo
+        if (movimientos2 != null) {
+            // Agrega cada movimiento de `movimientos2` a la lista `movimientos`
+            this.movimientos.addAll(movimientos2);
+        }
+    }
+    public void guardarMovimiento(Movimiento movimiento) {
         this.movimientos.add(movimiento);
     }
 

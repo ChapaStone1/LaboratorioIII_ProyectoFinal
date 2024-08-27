@@ -1,6 +1,8 @@
 package ar.edu.utn.frbb.tup.controller;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Movimiento;
+import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
@@ -8,7 +10,9 @@ import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaNotSupportedException;
 import ar.edu.utn.frbb.tup.service.CuentaService;
+import ar.edu.utn.frbb.tup.service.MovimientosService;
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.controller.dto.MovimientosDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +24,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/cuenta")
+@RequestMapping("/api/v1/cuenta")
 public class CuentaController {
 
     @Autowired
@@ -29,7 +33,9 @@ public class CuentaController {
     @Autowired
     private CuentaValidator cuentaValidator;
 
-    // Create a new account
+    @Autowired
+    private MovimientosService movimientoService;
+
     @PostMapping
     public ResponseEntity<Cuenta> crearCuenta(@RequestBody CuentaDto cuentaDto, WebRequest request) 
             throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, 
@@ -38,17 +44,15 @@ public class CuentaController {
         
         // Valida el DTO
         cuentaValidator.validate(cuentaDto);
-        
-        // Crea la cuenta a partir del DTO
         Cuenta cuenta = cuentaService.darDeAltaCuenta(cuentaDto);
-        
+      
         // Retorna la cuenta con un estado HTTP 201 (Created)
         return new ResponseEntity<>(cuenta, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{numeroCuenta}")
-    public Cuenta mostrarCuenta(@PathVariable long numeroCuenta, WebRequest request) throws NotExistCuentaException {
-        Cuenta cuenta = cuentaService.buscarCuentaPorNumeroCuenta(numeroCuenta);
+    @GetMapping("/{idCuenta}")
+    public Cuenta mostrarCuenta(@PathVariable("idCuenta") long idCuenta, WebRequest request) throws NotExistCuentaException {
+        Cuenta cuenta = cuentaService.buscarCuentaPorNumeroCuenta(idCuenta);
         return cuenta;
     }
 
@@ -56,4 +60,11 @@ public class CuentaController {
     public List<Cuenta> getCuentasCliente(@PathVariable("idcliente") long idcliente, WebRequest request) {
         return cuentaService.cuentasdeCliente(idcliente);
     }
+
+    @GetMapping("/{idCuenta}/movimientos")
+    public ResponseEntity<MovimientosDto> getMovimientos(@PathVariable("idCuenta") long idCuenta) throws NotExistCuentaException {
+        MovimientosDto respuesta = movimientoService.buscarMovimientosPorCuentaId(idCuenta);      
+        return ResponseEntity.ok(respuesta);
+    }
+
 }

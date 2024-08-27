@@ -10,7 +10,7 @@ import ar.edu.utn.frbb.tup.controller.validator.RetirosValidator;
 import ar.edu.utn.frbb.tup.service.RetirosService;
 
 @RestController
-@RequestMapping("/retiro")
+@RequestMapping("/api/v1/retiro")
 public class RetirosController {
     @Autowired
     private RetirosService retiroService;

@@ -10,7 +10,7 @@ import ar.edu.utn.frbb.tup.controller.validator.TransferenciaValidator;
 import ar.edu.utn.frbb.tup.service.TransferenciaService;
 
 @RestController
-@RequestMapping("/transferencia")
+@RequestMapping("/api/v1/transferencia")
 public class TransferenciaController {
 
     @Autowired
