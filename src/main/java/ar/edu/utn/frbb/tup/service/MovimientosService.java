@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.service;
-import java.util.List;
+
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,21 +31,21 @@ public class MovimientosService {
         // Crear y guardar el nuevo movimiento de consulta
         TipoMovimiento tipoMovimiento = TipoMovimiento.CONSULTA_MOVIMIENTOS;
         Movimiento nuevoMovimiento = new Movimiento();
-        nuevoMovimiento = nuevoMovimiento.guardarMovimiento(cuenta, tipoMovimiento, 0, cuenta.getNumeroCuenta(), cuenta.getNumeroCuenta());
-        
-        // Actualizar la cuenta si es necesario
-       // cuentaDao.save(cuenta); // Guarda la cuenta actualizada en la base de datos
-        
+        nuevoMovimiento = nuevoMovimiento.guardarMovimiento(cuenta, tipoMovimiento, 0, cuenta.getNumeroCuenta(), cuenta.getNumeroCuenta()); 
+      
         // Obtener y asignar los movimientos
-        List<Movimiento> movimientos = cuenta.getMovimientos().stream()
+        Set<Movimiento> movimientos = cuenta.getMovimientos().stream()
                 .map(movimiento -> new Movimiento(
+                        movimiento.getFecha(),
                         movimiento.getTipo(),
-                        movimiento.getMonto(),
-                        movimiento.getCuentaOrigen(),
-                        movimiento.getCuentaDestino()))
-                .collect(Collectors.toList());; // Verifica que esto esté retornando los movimientos correctos
+                        movimiento.getDescripcion(),
+                        movimiento.getMonto()))
+                .collect(Collectors.toSet());
+        ; // Verifica que esto esté retornando los movimientos correctos
+
+        // Asignar los movimientos al DTO
         respuestaMovimientosDto.setNumeroCuenta(cuenta.getNumeroCuenta());
-        respuestaMovimientosDto.setHistorialMovimientos(movimientos);
+        respuestaMovimientosDto.setRespuestaMovimientos(movimientos);
         
         return respuestaMovimientosDto;
     }

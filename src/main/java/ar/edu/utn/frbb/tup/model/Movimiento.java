@@ -2,36 +2,31 @@ package ar.edu.utn.frbb.tup.model;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Movimiento {
-    private static int contadorId = 0;
-    private int id;
     private LocalDateTime fecha;
     private TipoMovimiento tipo;
     private double monto;
+    @JsonIgnore
     private long cuentaOrigen;
+    @JsonIgnore
     private long cuentaDestino;
-    private long numTransaccion;
     private String descripcion;
+    private long numTransaccion;
+    
 
-    public Movimiento(TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
+    public Movimiento(LocalDateTime fecha, TipoMovimiento tipo, String descripcion, double monto) {
+        this.numTransaccion = generarNumTransaccion();
         this.fecha = LocalDateTime.now();
         this.tipo = tipo;
+        this.descripcion = descripcion;    
         this.monto = monto;
-        this.cuentaOrigen = cuentaOrigen;
-        this.cuentaDestino = cuentaDestino;
-        this.descripcion = generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino);
-        this.numTransaccion = generarNumTransaccion();
     }
 
     public Movimiento() {
-       // this.id = id;
-        this.fecha = LocalDateTime.now();
     }
-
     
-    private static synchronized int generarNuevoId() {
-        return ++contadorId;
-    }
     public long getCuentaDestino() {
         return cuentaDestino;
     }
@@ -43,9 +38,6 @@ public class Movimiento {
     }
     public LocalDateTime getFecha() {
         return fecha;
-    }
-    public int getId() {
-        return id;
     }
     public long getNumTransaccion() {
         return numTransaccion;
@@ -65,11 +57,8 @@ public class Movimiento {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
-    public void setId(int id) {
-        this.id = id;
+    public void setFecha() {
+        this.fecha = LocalDateTime.now();
     }
     public void setMonto(double monto) {
         this.monto = monto;
@@ -90,7 +79,7 @@ public class Movimiento {
             case DEPOSITO:
                 return "Depósito en cuenta: " + cuentaDestino;
             case TRANSFERENCIA:
-                return "Transferencia de cuenta: " + cuentaOrigen + " a cuenta: " + cuentaDestino;
+                return "Transferencia de cuenta" + cuentaOrigen + " a cuenta: " + cuentaDestino; 
             case CONSULTA_MOVIMIENTOS:
                 return "Consulta de movimientos.";
             default:
@@ -99,27 +88,30 @@ public class Movimiento {
     }
 
     public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
-        Movimiento movimiento = new Movimiento(tipo, monto, cuentaOrigen, cuentaDestino);
+        LocalDateTime fecha = LocalDateTime.now();
+        Movimiento movimiento = new Movimiento(fecha,tipo, "", monto);
         switch (tipo) {
             case DEPOSITO:
                 movimiento.setCuentaDestino(cuenta.getNumeroCuenta());
+                movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
                 break;
             case TRANSFERENCIA:
                 movimiento.setCuentaOrigen(cuentaOrigen);
                 movimiento.setCuentaDestino(cuentaDestino);
+                movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
                 break;
             case RETIRO:
                 movimiento.setMonto(-monto);
                 movimiento.setCuentaOrigen(cuenta.getNumeroCuenta());
+                movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
                 break;
             case CONSULTA_MOVIMIENTOS:
-            // No se realiza ninguna acción para CONSULTA_MOVIMIENTOS
+                movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, 0));
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de movimiento no válido: " + tipo);
         }
-        movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
-        movimiento.setId(generarNuevoId());
+        
         cuenta.guardarMovimiento(movimiento);
         
         return movimiento; // Retorna la instancia de Movimiento

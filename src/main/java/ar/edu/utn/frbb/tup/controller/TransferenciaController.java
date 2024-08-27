@@ -6,7 +6,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.controller.validator.TransferenciaValidator;
+import ar.edu.utn.frbb.tup.model.Operacion;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
+import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
+import ar.edu.utn.frbb.tup.model.exception.TipoDeCuentasException;
+import ar.edu.utn.frbb.tup.model.exception.TipoMonedaInvalidoException;
 import ar.edu.utn.frbb.tup.service.TransferenciaService;
 
 @RestController
@@ -21,8 +27,11 @@ public class TransferenciaController {
 
 
     //Endpoint para realizar una transferencia, ingresando Json con los campos necesarios (cuentaOrigen, cuentaDestino, monto y tipoMoneda)
-    //@PostMapping
-
+   @PostMapping
+    public Operacion transferir(@RequestBody TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaInvalidoException {
+        transferenciaValidator.validar(transferenciaDto);
+        return transferenciaService.realizarTransferencia(transferenciaDto);
+    }
 
     
 }

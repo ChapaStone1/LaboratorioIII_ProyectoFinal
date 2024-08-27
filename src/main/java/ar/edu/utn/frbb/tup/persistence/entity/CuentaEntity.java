@@ -8,7 +8,7 @@ import ar.edu.utn.frbb.tup.model.TipoMoneda;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 public class CuentaEntity extends BaseEntity{
     String nombre;
@@ -18,7 +18,7 @@ public class CuentaEntity extends BaseEntity{
     String moneda;
     Long titular;
     long numeroCuenta;
-    private List<Movimiento> movimientos;
+    private Set<Movimiento> movimientos;
 
     public CuentaEntity(Cuenta cuenta) {
         super(cuenta.getNumeroCuenta());

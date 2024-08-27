@@ -1,20 +1,21 @@
 package ar.edu.utn.frbb.tup.controller.dto;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 import ar.edu.utn.frbb.tup.model.Movimiento;
 
 public class MovimientosDto {
 
     private long numeroCuenta;
-    private List<Movimiento> movimientosCuenta;
+    private Set<Movimiento> movimientosCuenta;
 
     // Constructor sin parámetros
     public MovimientosDto() {
-        this.movimientosCuenta = new ArrayList<>();
+        this.movimientosCuenta = new HashSet<>();
     }
 
     // Constructor con parámetros
-    public MovimientosDto(long numeroCuenta, List<Movimiento> movimientosCuenta) {
+    public MovimientosDto(long numeroCuenta, Set<Movimiento> movimientosCuenta) {
         this.numeroCuenta = numeroCuenta;
         this.movimientosCuenta = movimientosCuenta;
     }
@@ -28,11 +29,11 @@ public class MovimientosDto {
         this.numeroCuenta = numeroCuenta;
     }
 
-    public List<Movimiento> getMovimientosCuenta() {
+    public Set<Movimiento> getMovimientosCuenta() {
         return movimientosCuenta;
     }
 
-    public void setHistorialMovimientos(List<Movimiento> movimientosCuenta) {
+    public void setRespuestaMovimientos(Set<Movimiento> movimientosCuenta) {
         this.movimientosCuenta = movimientosCuenta;
     }
 }
