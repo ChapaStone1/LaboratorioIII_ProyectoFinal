@@ -13,6 +13,7 @@ import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoDeCuentasException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaInvalidoException;
+import ar.edu.utn.frbb.tup.model.exception.TipoMonedaNotSupportedException;
 import ar.edu.utn.frbb.tup.service.TransferenciaService;
 
 @RestController
@@ -28,7 +29,7 @@ public class TransferenciaController {
 
     //Endpoint para realizar una transferencia, ingresando Json con los campos necesarios (cuentaOrigen, cuentaDestino, monto y tipoMoneda)
    @PostMapping
-    public RespuestaDto transferir(@RequestBody TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaInvalidoException {
+    public RespuestaDto transferir(@RequestBody TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaInvalidoException, TipoMonedaNotSupportedException {
         transferenciaValidator.validar(transferenciaDto);
         RespuestaDto operacion = transferenciaService.realizarTransferencia(transferenciaDto);
         
