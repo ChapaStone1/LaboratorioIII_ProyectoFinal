@@ -32,7 +32,8 @@ public class MovimientosService {
                         movimiento.getFecha(),
                         movimiento.getTipo(),
                         movimiento.getDescripcion(),
-                        movimiento.getMonto()))
+                        movimiento.getMonto(),
+                        movimiento.getNumMovimiento()))
                 .collect(Collectors.toSet());
         ; // Verifica que esto esté retornando los movimientos correctos
 

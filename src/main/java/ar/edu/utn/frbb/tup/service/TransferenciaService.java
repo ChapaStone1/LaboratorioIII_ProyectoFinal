@@ -3,8 +3,8 @@ package ar.edu.utn.frbb.tup.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
-import ar.edu.utn.frbb.tup.model.Operacion;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoDeCuentasException;
@@ -22,10 +22,9 @@ public class TransferenciaService {
     @Autowired
     private BanelcoService banelcoService;
 
-    public Operacion realizarTransferencia(TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException{
+    public RespuestaDto realizarTransferencia(TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException{
         // Obtener las cuentas
-        Operacion operacion = new Operacion();
-
+        RespuestaDto operacion = new RespuestaDto();
 
         return operacion;
     }

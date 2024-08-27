@@ -13,11 +13,11 @@ public class Movimiento {
     @JsonIgnore
     private long cuentaDestino;
     private String descripcion;
-    private long numTransaccion;
+    private long numMovimiento;
     
 
-    public Movimiento(LocalDateTime fecha, TipoMovimiento tipo, String descripcion, double monto) {
-        this.numTransaccion = generarNumTransaccion();
+    public Movimiento(LocalDateTime fecha, TipoMovimiento tipo, String descripcion, double monto, long numMovimiento) {
+        this.numMovimiento = numMovimiento;
         this.fecha = LocalDateTime.now();
         this.tipo = tipo;
         this.descripcion = descripcion;    
@@ -39,8 +39,8 @@ public class Movimiento {
     public LocalDateTime getFecha() {
         return fecha;
     }
-    public long getNumTransaccion() {
-        return numTransaccion;
+    public long getNumMovimiento() {
+        return numMovimiento;
     }
     public double getMonto() {
         return monto;
@@ -67,10 +67,6 @@ public class Movimiento {
         this.tipo = tipo;
     }
 
-    private long generarNumTransaccion() {
-        Random random = new Random();
-        return 100000 + random.nextInt(900000);
-    }
 
     private String generarDescripcion(double monto, TipoMovimiento tipo, long cuentaOrigen, long cuentaDestino) {
         switch (tipo) {
@@ -85,9 +81,9 @@ public class Movimiento {
         }
     }
 
-    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
+    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino, long numMovimiento) {
         LocalDateTime fecha = LocalDateTime.now();
-        Movimiento movimiento = new Movimiento(fecha,tipo, "", monto);
+        Movimiento movimiento = new Movimiento(fecha,tipo, "", monto, numMovimiento);
         switch (tipo) {
             case DEPOSITO:
                 movimiento.setCuentaDestino(cuenta.getNumeroCuenta());

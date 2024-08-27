@@ -7,6 +7,8 @@ public class RespuestaDto {
         this.estado = estado;
         this.mensaje = mensaje;
     }
+    public RespuestaDto() {
+    }
 
     // Getters y Setters
     public String getEstado() {
