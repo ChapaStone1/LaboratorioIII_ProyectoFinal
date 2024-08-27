@@ -80,8 +80,6 @@ public class Movimiento {
                 return "Depósito en cuenta: " + cuentaDestino;
             case TRANSFERENCIA:
                 return "Transferencia de cuenta" + cuentaOrigen + " a cuenta: " + cuentaDestino; 
-            case CONSULTA_MOVIMIENTOS:
-                return "Consulta de movimientos.";
             default:
                 return "Movimiento desconocido";
         }
@@ -105,15 +103,10 @@ public class Movimiento {
                 movimiento.setCuentaOrigen(cuenta.getNumeroCuenta());
                 movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, cuentaDestino));
                 break;
-            case CONSULTA_MOVIMIENTOS:
-                movimiento.setDescripcion(generarDescripcion(monto, tipo, cuentaOrigen, 0));
-                break;
             default:
                 throw new IllegalArgumentException("Tipo de movimiento no válido: " + tipo);
         }
-        
-        cuenta.guardarMovimiento(movimiento);
-        
+        cuenta.addMovimiento(movimiento);
         return movimiento; // Retorna la instancia de Movimiento
     }
 }

@@ -3,8 +3,7 @@ package ar.edu.utn.frbb.tup.model;
 public enum TipoMovimiento {
     RETIRO("R"),
     DEPOSITO("D"),
-    TRANSFERENCIA("T"),
-    CONSULTA_MOVIMIENTOS("C");
+    TRANSFERENCIA("T");
 
     private final String descripcion;
 

@@ -92,7 +92,7 @@ public class Cuenta {
         this.balance = balance;
         return this;
     }
-    public void guardarMovimiento(Movimiento movimiento) {
+    public void addMovimiento(Movimiento movimiento) {
         this.movimientos.add(movimiento);
     }
     public Set<Movimiento> getMovimientos() {

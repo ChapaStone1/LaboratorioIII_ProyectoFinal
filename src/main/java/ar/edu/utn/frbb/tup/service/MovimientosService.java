@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
-import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.controller.dto.MovimientosDto;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
@@ -27,12 +26,6 @@ public class MovimientosService {
 
     private MovimientosDto getMovimientos(Cuenta cuenta) {
         MovimientosDto respuestaMovimientosDto = new MovimientosDto();
-        
-        // Crear y guardar el nuevo movimiento de consulta
-        TipoMovimiento tipoMovimiento = TipoMovimiento.CONSULTA_MOVIMIENTOS;
-        Movimiento nuevoMovimiento = new Movimiento();
-        nuevoMovimiento = nuevoMovimiento.guardarMovimiento(cuenta, tipoMovimiento, 0, cuenta.getNumeroCuenta(), cuenta.getNumeroCuenta()); 
-      
         // Obtener y asignar los movimientos
         Set<Movimiento> movimientos = cuenta.getMovimientos().stream()
                 .map(movimiento -> new Movimiento(

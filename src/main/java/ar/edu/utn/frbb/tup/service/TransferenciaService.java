@@ -1,10 +1,8 @@
 package ar.edu.utn.frbb.tup.service;
-import java.nio.file.OpenOption;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.model.Operacion;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
