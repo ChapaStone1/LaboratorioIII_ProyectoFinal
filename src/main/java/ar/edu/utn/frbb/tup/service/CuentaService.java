@@ -1,8 +1,10 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.TipoMovimiento;
@@ -50,7 +52,6 @@ public class CuentaService {
         return cuenta;
     }
   
-
     // Validaciones de cuenta
     // Valido que cuenta y moneda sean soportadas
     private boolean tipoCuentaYMonedaSoportada(Cuenta cuenta) {
@@ -72,8 +73,6 @@ public class CuentaService {
         List<Cuenta> cuentas = cuentaDao.getCuentasByCliente(dni);
         return cuentas != null ? cuentas : new ArrayList<>();
     }
-
-
     // Retorno la lista de todas las cuentas de un cliente para el GET de cuentas de cliente
 
     public Cuenta buscarCuentaPorNumeroCuenta(long numeroCuenta) throws NotExistCuentaException {
@@ -86,14 +85,45 @@ public class CuentaService {
         }
     }
 
-
     private Cuenta parsearCuenta(CuentaDto cuentaDto) throws ClienteNotExistException {
         Cuenta cuenta = new Cuenta(cuentaDto);
         Cliente titular = clienteService.buscarClientePorDni(cuentaDto.getDni());
         cuenta.setTitular(titular);
         return cuenta;
     }
+    
+    private Cuenta buscarCuentaPorNumeroCuenta(Set<Cuenta> cuentas, long numeroCuenta) {
+        for (Cuenta cuenta : cuentas) {
+            if (cuenta.getNumeroCuenta() == numeroCuenta) {
+                return cuenta;
+            }
+        }
+        return null;
+    }
 
+    // metodos para calcular balances y comisiones
+    public double calcularComision(TipoMoneda moneda, double monto) {
+        if (moneda == TipoMoneda.PESOS && monto >= 1000000) {
+            return 0.02 * monto;
+        } else if (moneda == TipoMoneda.DOLARES && monto >= 5000) {
+            return 0.005 * monto;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    public double balanceCuentaOrigen(double balance, double monto, double comision){
+        return balance - monto - comision;
+    }
+
+    public double balanceCuentaDestino(double balance, double monto, double comision){
+        return balance + (monto - comision);
+    }
+
+    public void actualizarCuenta(Cuenta cuenta){
+        cuentaDao.actualizarCuenta(cuenta);
+    }
     public void actualizarBalance(Cuenta cuenta, double nuevoBalance, TipoMovimiento movimiento){
         cuenta.setBalance(nuevoBalance);
 
@@ -103,7 +133,6 @@ public class CuentaService {
 
         actualizarCuentaEnCliente(clienteOrigen, cuenta);
     }
-
     private void actualizarCuentaEnCliente(Cliente cliente, Cuenta cuentaActualizada) {
         if (cliente != null) {
             Set<Cuenta> cuentas = cliente.getCuentas();
@@ -116,14 +145,32 @@ public class CuentaService {
             }
         }
     }
-    private Cuenta buscarCuentaPorNumeroCuenta(Set<Cuenta> cuentas, long numeroCuenta) {
-        for (Cuenta cuenta : cuentas) {
-            if (cuenta.getNumeroCuenta() == numeroCuenta) {
-                return cuenta;
-            }
-        }
-        return null;
+
+    // metodos para agregar movimientos al historial
+    public RespuestaDto agregarMovimientoTransferencia(Cuenta cuenta, TipoMovimiento movimiento, double monto, long numCuentaOrigen, long numCuentaDestino){
+        Movimiento movimientoNuevo = new Movimiento();
+        RespuestaDto respuesta = new RespuestaDto();
+        movimientoNuevo.guardarMovimiento(cuenta, movimiento, monto, numCuentaOrigen, numCuentaDestino);
+        respuesta.setEstado("EXITOSA");
+        respuesta.setMensaje("Transferencia Exitosa. Número de transferencia: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
+        return respuesta;
     }
 
+    public RespuestaDto agregarMovimientoRetiro(Cuenta cuenta, double monto, long numCuentaOrigen){
+        Movimiento movimientoNuevo = new Movimiento();
+        RespuestaDto respuesta = new RespuestaDto();
+        movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.RETIRO, monto, numCuentaOrigen, numCuentaOrigen);
+        respuesta.setEstado("EXITOSA");
+        respuesta.setMensaje("Retiro Exitoso. Número de movimiento: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
+        return respuesta;
+    }
 
+    public RespuestaDto agregarMovimientoDeposito(Cuenta cuenta, double monto, long numCuentaOrigen){
+        Movimiento movimientoNuevo = new Movimiento();
+        RespuestaDto respuesta = new RespuestaDto();
+        movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.DEPOSITO, monto, numCuentaOrigen, numCuentaOrigen);
+        respuesta.setEstado("EXITOSA");
+        respuesta.setMensaje("Deposito Exitoso. Número de movimiento: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
+        return respuesta;
+    }
 }

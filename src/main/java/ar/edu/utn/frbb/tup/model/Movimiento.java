@@ -73,7 +73,7 @@ public class Movimiento {
             case RETIRO:
                 return "Retiro en cuenta: " + cuentaOrigen;
             case DEPOSITO:
-                return "Depósito en cuenta: " + cuentaDestino;
+                return "Depósito en cuenta: " + cuentaOrigen;
             case TRANSFERENCIA:
                 return "Transferencia de cuenta" + cuentaOrigen + " a cuenta: " + cuentaDestino; 
             default:
