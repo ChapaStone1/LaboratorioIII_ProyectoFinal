@@ -13,7 +13,7 @@ import java.util.Set;
 public class CuentaEntity extends BaseEntity{
     String nombre;
     LocalDateTime fechaCreacion;
-    int balance;
+    double balance;
     String tipoCuenta;
     String moneda;
     Long titular;

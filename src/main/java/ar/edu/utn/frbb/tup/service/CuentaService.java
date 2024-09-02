@@ -5,23 +5,29 @@ import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
+import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaNotSupportedException;
+import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Component
 public class CuentaService {
     CuentaDao cuentaDao = new CuentaDao();
+
+    @Autowired
+    private ClienteDao clienteDao;
 
     @Autowired
     ClienteService clienteService;
@@ -87,5 +93,37 @@ public class CuentaService {
         cuenta.setTitular(titular);
         return cuenta;
     }
+
+    public void actualizarBalance(Cuenta cuenta, double nuevoBalance, TipoMovimiento movimiento){
+        cuenta.setBalance(nuevoBalance);
+
+        cuentaDao.actualizarCuenta(cuenta);
+
+        Cliente clienteOrigen = cuenta.getTitular();
+
+        actualizarCuentaEnCliente(clienteOrigen, cuenta);
+    }
+
+    private void actualizarCuentaEnCliente(Cliente cliente, Cuenta cuentaActualizada) {
+        if (cliente != null) {
+            Set<Cuenta> cuentas = cliente.getCuentas();
+            Cuenta cuentaExistente = buscarCuentaPorNumeroCuenta(cuentas, cuentaActualizada.getNumeroCuenta());
+
+            if (cuentaExistente != null) {
+                cuentas.remove(cuentaExistente);
+                cuentas.add(cuentaActualizada);
+                clienteDao.actualizarCliente(cliente);
+            }
+        }
+    }
+    private Cuenta buscarCuentaPorNumeroCuenta(Set<Cuenta> cuentas, long numeroCuenta) {
+        for (Cuenta cuenta : cuentas) {
+            if (cuenta.getNumeroCuenta() == numeroCuenta) {
+                return cuenta;
+            }
+        }
+        return null;
+    }
+
 
 }

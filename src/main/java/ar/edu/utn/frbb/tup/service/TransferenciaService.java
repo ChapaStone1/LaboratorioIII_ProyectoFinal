@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
@@ -35,17 +36,8 @@ public class TransferenciaService {
 
         Cuenta cuentaDestino = cuentaDao.findByNumeroCuenta(transferenciaDto.getCuentaDestino());
         if (cuentaDestino == null) {
-            throw new NotExistCuentaException("La cuenta " + transferenciaDto.getCuentaDestino() + " (cuenta de destino) no existe.");
-        }
-        if (!cuentaOrigen.getMoneda().equals(cuentaDestino.getMoneda()) || !(String.valueOf(cuentaOrigen.getMoneda())).equals(transferenciaDto.getMoneda()) || !(String.valueOf(cuentaDestino.getMoneda())).equals(transferenciaDto.getMoneda())) {
-            throw new TipoMonedaNotSupportedException("Las monedas de las cuentas no coinciden.");
-        }
-        if ((cuentaOrigen.getTitular().getBanco()).equals(cuentaDestino.getTitular().getBanco())) {
-            return realizarTransferenciaYActualizarBalance(transferenciaDto, cuentaOrigen, cuentaDestino);
-
-        } else {
             if (banelcoService.servicioDeBanelco(transferenciaDto)) {
-                return realizarTransferenciaYActualizarBalance(transferenciaDto, cuentaOrigen, cuentaDestino);
+                return transferirOtroBanco(transferenciaDto, cuentaOrigen, cuentaDestino);
                 //RespuestaDto respuestaDto = new RespuestaDto();
                 //respuestaDto.setEstado("EXITOSA");
                 //respuestaDto.setMensaje("Se realizo la transferencia de cuenta " + cuentaOrigen + " a cuenta " + cuentaDestino + " por el monto de " + transferenciaDto.getMonto() + " " + transferenciaDto.getMoneda() + ".");
@@ -56,29 +48,36 @@ public class TransferenciaService {
                 return respuestaDto;
             }
         }
-    }
-    private RespuestaDto realizarTransferenciaYActualizarBalance(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) {
-        RespuestaDto respuesta = new RespuestaDto();
+        if (!cuentaOrigen.getMoneda().equals(cuentaDestino.getMoneda()) || !(String.valueOf(cuentaOrigen.getMoneda())).equals(transferenciaDto.getMoneda()) || !(String.valueOf(cuentaDestino.getMoneda())).equals(transferenciaDto.getMoneda())) {
+            throw new TipoMonedaNotSupportedException("Las monedas de las cuentas no coinciden.");
+        }
+        return transferirMismoBanco(transferenciaDto, cuentaOrigen, cuentaDestino);
 
-        Transferencia transferencia = toTransferencia(transferenciaDto);
+    }
+   
+    private RespuestaDto transferirMismoBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) {
+        RespuestaDto respuesta = new RespuestaDto();
+        Movimiento movimientoOrigen = new Movimiento();
+        Movimiento movimientoDestino = new Movimiento();
 
         if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
-            double comision = transaccion.calcularComision(transferenciaDto);
+            double comision = calcularComision(transferenciaDto);
+            double balanceCuentaOrigen = balanceCuentaOrigen(comision, comision, comision);
+            double balanceCuentaDestino = balanceCuentaDestino(balanceCuentaOrigen, balanceCuentaOrigen, comision);
+            cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
+            cuentaService.actualizarBalance(cuentaDestino, balanceCuentaDestino, TipoMovimiento.TRANSFERENCIA);
 
-            cuentaService.actualizarBalance(cuentaOrigen, transferenciaDto.getMonto(), comision, TipoMovimiento.TRANSFERENCIA_SALIDA);
-            cuentaService.actualizarBalance(cuentaDestino, transferenciaDto.getMonto(), comision, TipoMovimiento.TRANSFERENCIA_ENTRADA);
-
-            // Creo y agrego las transacciones al historial
-            transaccion.save(cuentaOrigen, transferencia, TipoMovimiento.TRANSFERENCIA_SALIDA, "Transferencia a cuenta " + cuentaDestino.getNumeroCuenta());
-            transaccion.save(cuentaDestino, transferencia, TipoMovimiento.TRANSFERENCIA_ENTRADA, "Transferencia desde cuenta " + cuentaOrigen.getNumeroCuenta());
+            // Creo y agrego los movimientos
+            movimientoOrigen.guardarMovimiento(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, balanceCuentaOrigen, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+            movimientoDestino.guardarMovimiento(cuentaDestino, TipoMovimiento.TRANSFERENCIA, balanceCuentaDestino, cuentaDestino.getNumeroCuenta(), cuentaOrigen.getNumeroCuenta());
 
             // Actualizo las cuentas en la base de datos
-            cuentaDao.update(cuentaOrigen);
-            cuentaDao.update(cuentaDestino);
+            cuentaDao.actualizarCuenta(cuentaOrigen);
+            cuentaDao.actualizarCuenta(cuentaDestino);
 
             // Preparo una respuestaDto
             respuesta.setEstado("EXITOSA");
-            respuesta.setMensaje("Se realizó la transferencia exitosamente. Número de transferencia: " + transferencia.getNumeroTransaccion() + ". Realizado el " + transferencia.getFecha() + ". Saldo actual: " + (cuentaOrigen.getBalance() > 0 ? (TipoMoneda.valueOf(transferenciaDto.getMoneda()) == TipoMoneda.PESOS ? "ARG $ " : "USD $ ") + cuentaOrigen.getBalance() : "Usted tiene una deuda con el Banco."));
+            respuesta.setMensaje("Transferencia Exitosa. Número de transferencia: " + movimientoOrigen.getNumMovimiento() + ". Realizado el " + movimientoOrigen.getFecha());
             return respuesta;
         } else {
             respuesta.setEstado("FALLIDA");
@@ -87,13 +86,23 @@ public class TransferenciaService {
         }
     }
 
-    private Transferencia toTransferencia(TransferenciaDto transferenciaDto) {
-        Transferencia transferencia = new Transferencia();
-        transferencia.setMonto(transferenciaDto.getMonto());
-        transferencia.setCuentaOrigen(transferenciaDto.getCuentaOrigen());
-        transferencia.setCuentaDestino(transferenciaDto.getCuentaDestino());
-        transferencia.setMoneda(transferenciaDto.getMoneda());
-        return transferencia;
+    private double calcularComision(TransferenciasDto transferenciaDto) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'calcularComision'");
     }
-    
+
+    private double balanceCuentaOrigen(double balance, double monto, double comision){
+        return balance - monto - comision;
+    }
+    private double balanceCuentaDestino(double balance, double monto, double comision){
+        return balance + monto;
+    }
+
+    private double calcularNuevoBalance(double balance, double monto, double comision, TipoMovimiento movimiento){
+        return balance - monto - comision;
+    }
+    private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'transferirOtroBanco'");
+    }        
 }

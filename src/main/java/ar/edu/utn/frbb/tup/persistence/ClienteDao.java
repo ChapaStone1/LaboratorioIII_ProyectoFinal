@@ -39,14 +39,18 @@ public class ClienteDao extends AbstractBaseDao{
     }
 
 
-        public void save(Cliente cliente) {
-            ClienteEntity entity = new ClienteEntity(cliente);
-            getInMemoryDatabase().put(entity.getId(), entity);
-        }
+    public void save(Cliente cliente) {
+        ClienteEntity entity = new ClienteEntity(cliente);
+        getInMemoryDatabase().put(entity.getId(), entity);
+    }
+    public boolean actualizarCliente(Cliente cliente) {
+        ClienteEntity entity = new ClienteEntity(cliente);
+        return getInMemoryDatabase().put(cliente.getDni(), entity) != null;
+    }
 
 
-        @Override
-        protected String getEntityName() {
-            return "CLIENTE";
-        }
+    @Override
+    protected String getEntityName() {
+        return "CLIENTE";
+    }
 }

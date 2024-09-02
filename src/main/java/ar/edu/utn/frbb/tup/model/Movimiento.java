@@ -80,10 +80,13 @@ public class Movimiento {
                 return "Movimiento desconocido";
         }
     }
+    private long setNumeroMovimiento() {
+        return new Random().nextLong(9999) + 1000;
+    }   
 
-    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino, long numMovimiento) {
+    public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
         LocalDateTime fecha = LocalDateTime.now();
-        Movimiento movimiento = new Movimiento(fecha,tipo, "", monto, numMovimiento);
+        Movimiento movimiento = new Movimiento(fecha,tipo, "", monto, setNumeroMovimiento());
         switch (tipo) {
             case DEPOSITO:
                 movimiento.setCuentaDestino(cuenta.getNumeroCuenta());
