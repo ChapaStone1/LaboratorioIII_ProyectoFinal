@@ -42,7 +42,7 @@ public class RetirosValidator {
     }
 
     public void validarMoneda(String moneda) throws InputErrorException {
-        if (!"PESOS".equalsIgnoreCase(moneda) && !"DOLARES".equalsIgnoreCase(moneda)) {
+        if (!"P".equalsIgnoreCase(moneda) && !"D".equalsIgnoreCase(moneda)) {
             throw new InputErrorException("El TIPO DE MONEDA ingresado no es valido.");
         }
     }

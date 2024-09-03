@@ -23,18 +23,15 @@ public class ClienteController {
     @Autowired
     private ClienteValidator clienteValidator;
 
-
     @PostMapping
     public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException {
-        clienteValidator.validate(clienteDto);
+        clienteValidator.validar(clienteDto);
         return clienteService.darDeAltaCliente(clienteDto);
     }
-
     
     @GetMapping("/{dni}")
     public Cliente getCliente(@PathVariable long dni) {
-        clienteValidator.validateDNI(dni);
+        clienteValidator.validateDni(dni);
         return clienteService.buscarClientePorDni(dni);
     }
-
 }

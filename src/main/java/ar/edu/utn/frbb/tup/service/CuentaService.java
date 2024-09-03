@@ -26,7 +26,8 @@ import java.util.Set;
 
 @Component
 public class CuentaService {
-    CuentaDao cuentaDao = new CuentaDao();
+    @Autowired
+    private CuentaDao cuentaDao;
 
     @Autowired
     private ClienteDao clienteDao;
@@ -36,6 +37,10 @@ public class CuentaService {
 
     public Cuenta darDeAltaCuenta(CuentaDto cuentadto) throws ClienteNotExistException, CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, TipoMonedaNotSupportedException {
         Cuenta cuenta = parsearCuenta(cuentadto);
+
+        if (cuenta.getTitular() == null) {
+            throw new IllegalStateException("El titular de la cuenta no está asignado.");
+        }
         
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
@@ -49,14 +54,18 @@ public class CuentaService {
         
         clienteService.agregarCuenta(cuenta, cuentadto.getDni());
         cuentaDao.save(cuenta);
+        System.out.println(cuenta.getTitular().getApellido());
+        System.out.println(cuenta.getNumeroCuenta());
         return cuenta;
     }
   
     // Validaciones de cuenta
     // Valido que cuenta y moneda sean soportadas
     private boolean tipoCuentaYMonedaSoportada(Cuenta cuenta) {
-        return (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && (cuenta.getMoneda() == TipoMoneda.PESOS || cuenta.getMoneda() == TipoMoneda.DOLARES)) ||
-               (cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE && cuenta.getMoneda() == TipoMoneda.PESOS);
+        return (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && 
+        (cuenta.getMoneda() == TipoMoneda.PESOS || cuenta.getMoneda() == TipoMoneda.DOLARES)) ||
+       (cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE && 
+        cuenta.getMoneda() == TipoMoneda.PESOS);
     }
 
     // Valido que el cliente no tenga cuentas del mismo tipo
@@ -79,7 +88,6 @@ public class CuentaService {
         if (cuentaDao.findByNumeroCuenta(numeroCuenta) != null){
             return cuentaDao.findByNumeroCuenta(numeroCuenta);
         } 
-
         else{
             throw new NotExistCuentaException("Número de cuenta no existe.");
         }
@@ -124,12 +132,21 @@ public class CuentaService {
     public void actualizarCuenta(Cuenta cuenta){
         cuentaDao.actualizarCuenta(cuenta);
     }
-    public void actualizarBalance(Cuenta cuenta, double nuevoBalance, TipoMovimiento movimiento){
+    public void actualizarBalance(Cuenta cuenta, double nuevoBalance, TipoMovimiento movimiento) throws ClienteNotExistException{
+        if (cuenta.getTitular() == null) {
+            throw new IllegalStateException("La cuenta no tiene un titular asignado.");
+        }
+        
         cuenta.setBalance(nuevoBalance);
 
         cuentaDao.actualizarCuenta(cuenta);
 
-        Cliente clienteOrigen = cuenta.getTitular();
+        Cliente clienteOrigen = clienteDao.find(cuenta.getTitular().getDni(), true);
+        if (clienteOrigen != null) {
+            actualizarCuentaEnCliente(clienteOrigen, cuenta);
+        } else {
+            throw new ClienteNotExistException("El cliente con DNI " + cuenta.getTitular().getDni() + " no existe.");
+        }
 
         actualizarCuentaEnCliente(clienteOrigen, cuenta);
     }

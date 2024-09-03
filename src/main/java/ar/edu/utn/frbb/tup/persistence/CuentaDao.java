@@ -1,8 +1,6 @@
 package ar.edu.utn.frbb.tup.persistence;
 
-import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
 import ar.edu.utn.frbb.tup.persistence.entity.CuentaEntity;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +47,6 @@ public class CuentaDao  extends AbstractBaseDao{
         }
         return null;
     }
-
     public void actualizarCuenta(Cuenta cuenta){
         CuentaEntity cuentaEntity = new CuentaEntity(cuenta);
         getInMemoryDatabase().put(cuenta.getNumeroCuenta(), cuentaEntity);

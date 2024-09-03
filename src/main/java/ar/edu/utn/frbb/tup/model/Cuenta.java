@@ -45,7 +45,6 @@ public class Cuenta {
         this.titular = titular;
     }
 
-
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
     }

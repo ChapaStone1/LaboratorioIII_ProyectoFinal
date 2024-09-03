@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.dto.RetirosDto;
 import ar.edu.utn.frbb.tup.controller.validator.RetirosValidator;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.InputErrorException;
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
@@ -25,7 +26,7 @@ public class RetirosController {
     private RetirosValidator retiroValidator;
 
     @PostMapping
-    public RespuestaDto realizarRetiro(@RequestBody RetirosDto retiroDto) throws TipoMonedaInvalidoException, InputErrorException, NotExistCuentaException, NoAlcanzaException {
+    public RespuestaDto realizarRetiro(@RequestBody RetirosDto retiroDto) throws TipoMonedaInvalidoException, InputErrorException, NotExistCuentaException, NoAlcanzaException, ClienteNotExistException {
         retiroValidator.validar(retiroDto);
         return retiroService.realizarRetiro(retiroDto);
     }

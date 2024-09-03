@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.edu.utn.frbb.tup.controller.dto.DepositosDto;
 import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.validator.DepositosValidator;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.InputErrorException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaInvalidoException;
@@ -24,8 +25,9 @@ public class DepositosController {
     private DepositosValidator depositoValidator;
 
     @PostMapping
-    public RespuestaDto realizarDeposito(@RequestBody DepositosDto depositoDto) throws TipoMonedaInvalidoException, InputErrorException, NotExistCuentaException {
+    public RespuestaDto realizarDeposito(@RequestBody DepositosDto depositoDto) throws TipoMonedaInvalidoException, InputErrorException, NotExistCuentaException, ClienteNotExistException {
         depositoValidator.validar(depositoDto);
-        return depositoService.realizarDeposito(depositoDto);
+        RespuestaDto respuesta = depositoService.realizarDeposito(depositoDto);
+        return respuesta;
     }
 }

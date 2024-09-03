@@ -1,8 +1,6 @@
 package ar.edu.utn.frbb.tup.controller;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.Movimiento;
-import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
@@ -43,7 +41,7 @@ public class CuentaController {
                 ClienteNotExistException {
         
         // Valida el DTO
-        cuentaValidator.validate(cuentaDto);
+        cuentaValidator.validar(cuentaDto);
         Cuenta cuenta = cuentaService.darDeAltaCuenta(cuentaDto);
       
         // Retorna la cuenta con un estado HTTP 201 (Created)

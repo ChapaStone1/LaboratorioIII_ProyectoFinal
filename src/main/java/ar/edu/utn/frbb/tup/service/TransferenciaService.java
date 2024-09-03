@@ -8,6 +8,7 @@ import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.TipoMovimiento;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoDeCuentasException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaNotSupportedException;
@@ -21,7 +22,7 @@ public class TransferenciaService {
     @Autowired
     private BanelcoService banelcoService;
 
-    public RespuestaDto realizarTransferencia(TransferenciasDto transferenciaDto) throws NotExistCuentaException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaNotSupportedException{
+    public RespuestaDto realizarTransferencia(TransferenciasDto transferenciaDto) throws NotExistCuentaException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaNotSupportedException, ClienteNotExistException{
         // Obtener las cuentas
         Cuenta cuentaOrigen = cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaOrigen());
         if (cuentaOrigen == null) {
@@ -46,7 +47,7 @@ public class TransferenciaService {
 
     }
    
-    private RespuestaDto transferirMismoBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) {
+    private RespuestaDto transferirMismoBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) throws ClienteNotExistException {
         RespuestaDto respuesta = new RespuestaDto();
 
         if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
@@ -80,7 +81,7 @@ public class TransferenciaService {
         }
     } 
 
-    private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) {
+    private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) throws ClienteNotExistException {
         RespuestaDto respuesta = new RespuestaDto();
         if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
             // calculo la comision en cuentaservice

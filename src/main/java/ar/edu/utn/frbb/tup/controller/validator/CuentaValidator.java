@@ -8,7 +8,7 @@ import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 
 @Component
 public class CuentaValidator {
-    public void validate(CuentaDto cuentaDto) {
+    public void validar(CuentaDto cuentaDto) {
         List<String> tiposCuentaValidos = Arrays.asList("CC", "CA");
         List<String> monedasValidas = Arrays.asList("P", "D");
 

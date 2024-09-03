@@ -26,13 +26,11 @@ public class TransferenciaController {
     @Autowired
     private TransferenciaValidator transferenciaValidator;
 
-
     //Endpoint para realizar una transferencia, ingresando Json con los campos necesarios (cuentaOrigen, cuentaDestino, monto y tipoMoneda)
    @PostMapping
     public RespuestaDto transferir(@RequestBody TransferenciasDto transferenciaDto) throws ClienteNotExistException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaInvalidoException, TipoMonedaNotSupportedException {
         transferenciaValidator.validar(transferenciaDto);
-        RespuestaDto operacion = transferenciaService.realizarTransferencia(transferenciaDto);
-        
-        return operacion;
+        RespuestaDto respuesta = transferenciaService.realizarTransferencia(transferenciaDto);
+        return respuesta;
     }   
 }

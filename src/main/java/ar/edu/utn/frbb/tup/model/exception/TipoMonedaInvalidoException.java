@@ -4,6 +4,4 @@ public class TipoMonedaInvalidoException extends Throwable {
     public TipoMonedaInvalidoException(String message) {
         super(message);
     }
-
-
 }

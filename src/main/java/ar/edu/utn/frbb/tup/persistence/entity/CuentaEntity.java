@@ -1,6 +1,7 @@
 package ar.edu.utn.frbb.tup.persistence.entity;
 
 
+import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
@@ -16,7 +17,7 @@ public class CuentaEntity extends BaseEntity{
     double balance;
     String tipoCuenta;
     String moneda;
-    Long titular;
+    Cliente titular;
     long numeroCuenta;
     private Set<Movimiento> movimientos;
 
@@ -24,7 +25,7 @@ public class CuentaEntity extends BaseEntity{
         super(cuenta.getNumeroCuenta());
         this.balance = cuenta.getBalance();
         this.tipoCuenta = cuenta.getTipoCuenta().toString();
-        this.titular = cuenta.getTitular().getDni();
+        this.titular = cuenta.getTitular();
         this.fechaCreacion = cuenta.getFechaCreacion();
         this.moneda = cuenta.getMoneda().toString();
         this.numeroCuenta = cuenta.getNumeroCuenta();
@@ -39,10 +40,11 @@ public class CuentaEntity extends BaseEntity{
         cuenta.setFechaCreacion(this.fechaCreacion);
         cuenta.setMoneda(TipoMoneda.valueOf(this.moneda));
         cuenta.setMovimientos(this.movimientos);
+        cuenta.setTitular(this.titular);
         return cuenta;
     }
 
-    public Long getTitular() {
+    public Cliente getTitular() {
         return titular;
     }
     public LocalDateTime getFechaCreacion() {
