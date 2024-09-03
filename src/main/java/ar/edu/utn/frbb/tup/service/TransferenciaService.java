@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ar.edu.utn.frbb.tup.controller.dto.RespuestaDto;
 import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
@@ -32,15 +31,16 @@ public class TransferenciaService {
         Cuenta cuentaDestino = cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaDestino());
         if (cuentaDestino == null) {
             if (banelcoService.servicioDeBanelco(transferenciaDto)) {
-                return transferirOtroBanco(transferenciaDto, cuentaOrigen, cuentaDestino);
+                return transferirOtroBanco(transferenciaDto, cuentaOrigen);
             } else {
                 RespuestaDto respuestaDto = new RespuestaDto();
                 respuestaDto.setEstado("FALLIDA");
-                respuestaDto.setMensaje("No es posible realizar la transferencia, los bancos son diferentes.");
+                respuestaDto.setMensaje("No es posible realizar la transferencia, banco de destino no se encuentra en Red Banelco.");
                 return respuestaDto;
             }
         }
-        if (!cuentaOrigen.getMoneda().equals(cuentaDestino.getMoneda()) || !(String.valueOf(cuentaOrigen.getMoneda())).equals(transferenciaDto.getMoneda()) || !(String.valueOf(cuentaDestino.getMoneda())).equals(transferenciaDto.getMoneda())) {
+        System.out.println("Cuenta de origen: " + cuentaOrigen.getNumeroCuenta() + ", Moneda: " + cuentaOrigen.getMoneda());
+        if (!cuentaOrigen.getMoneda().equals(cuentaDestino.getMoneda()) || !(cuentaOrigen.getMoneda()).equals(cuentaDestino.getMoneda()) || !(cuentaDestino.getMoneda()).equals(cuentaDestino.getMoneda())) {
             throw new TipoMonedaNotSupportedException("Las monedas de las cuentas no coinciden.");
         }
         return transferirMismoBanco(transferenciaDto, cuentaOrigen, cuentaDestino);
@@ -53,7 +53,7 @@ public class TransferenciaService {
         if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
 
             // calculo la comision en cuentaservice
-            double comision = cuentaService.calcularComision(TipoMoneda.valueOf(transferenciaDto.getMoneda()), transferenciaDto.getMonto());
+            double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
 
             //calculo los balances en cuentaService
             double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
@@ -81,17 +81,17 @@ public class TransferenciaService {
         }
     } 
 
-    private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) throws ClienteNotExistException {
+    private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen) throws ClienteNotExistException {
         RespuestaDto respuesta = new RespuestaDto();
         if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
             // calculo la comision en cuentaservice
-            double comision = cuentaService.calcularComision(TipoMoneda.valueOf(transferenciaDto.getMoneda()), transferenciaDto.getMonto());
+            double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
             //calculo el nuevo balance en cuentaService
             double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
             // actualizo los balances en cuentaService
             cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
             // Creo y agrego los movimientos para ambas cuentas
-            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
             // Actualizo las cuentas en la base de datos
             cuentaService.actualizarCuenta(cuentaOrigen);
             // retorno la respuesta

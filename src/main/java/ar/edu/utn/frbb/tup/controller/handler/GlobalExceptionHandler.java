@@ -1,5 +1,7 @@
 package ar.edu.utn.frbb.tup.controller.handler;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -113,6 +115,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTipoMonedaNotSupportedException(TipoMonedaNotSupportedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .body("Tipo de moneda no soportado: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(InvocationTargetException.class)
+    public ResponseEntity<String> handleInvocationTargetException(InvocationTargetException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al invocar el método: " + ex.getTargetException().getMessage());
     }
     
 }

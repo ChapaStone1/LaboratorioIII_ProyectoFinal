@@ -87,7 +87,7 @@ public class CuentaService {
             return cuentaDao.findByNumeroCuenta(numeroCuenta);
         } 
         else{
-            throw new NotExistCuentaException("Número de cuenta no existe.");
+            return null;
         }
     }
 
