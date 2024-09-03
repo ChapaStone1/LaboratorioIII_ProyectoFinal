@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ar.edu.utn.frbb.tup.model.exception.CapturaInternacionalException;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.DeudorVerazException;
 import ar.edu.utn.frbb.tup.model.exception.InputErrorException;
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
@@ -49,6 +51,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleClienteNotExistException(ClienteNotExistException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body("Cliente no encontrado: " + ex.getMessage());
+    }
+    @ExceptionHandler(CapturaInternacionalException.class)
+    public ResponseEntity<String> handleCapturaInternacionalException(CapturaInternacionalException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                             .body("El cliente posee pedido de captura internacional: " + ex.getMessage());
+    }
+    @ExceptionHandler(DeudorVerazException.class)
+    public ResponseEntity<String> handleDeudorVerazException(DeudorVerazException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                             .body("El cliente figura como deudor en los servicios de Veraz: " + ex.getMessage());
     }
 
     // Cuentas Exception
@@ -102,4 +114,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .body("Tipo de moneda no soportado: " + ex.getMessage());
     }
+    
 }

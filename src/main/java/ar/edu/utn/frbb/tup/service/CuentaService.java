@@ -44,10 +44,12 @@ public class CuentaService {
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }
+        // Valido que cuenta y moneda sean soportadas CA en pesos o CA en dolares y CC en pesos
         if (!tipoCuentaYMonedaSoportada(cuenta)) {
             throw new TipoCuentaNotSupportedException("El tipo de cuenta " + cuenta.getTipoCuenta() + " y/o el tipo de moneda " + cuenta.getMoneda() + " no está soportado.");
         }
-        if (cuentaMismoTipo(cuenta, cuentasdeCliente(cuentadto.getDni()))) {
+
+        if (cuentaYMonedaMismoTipo(cuenta, cuentasdeCliente(cuentadto.getDni()))) {
             throw new TipoCuentaAlreadyExistsException("El cliente " + cuentadto.getDni() + " ya tiene una cuenta de tipo " + cuenta.getTipoCuenta() + ".");
         }
         
@@ -59,18 +61,15 @@ public class CuentaService {
     }
   
     // Validaciones de cuenta
-    // Valido que cuenta y moneda sean soportadas
+    // Valido que cuenta y moneda sean soportadas CA en pesos o CA en dolares y CC en pesos
     private boolean tipoCuentaYMonedaSoportada(Cuenta cuenta) {
-        return (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && 
-        (cuenta.getMoneda() == TipoMoneda.PESOS || cuenta.getMoneda() == TipoMoneda.DOLARES)) ||
-       (cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE && 
-        cuenta.getMoneda() == TipoMoneda.PESOS);
+        return (cuenta.getTipoCuenta() == TipoCuenta.CAJA_AHORRO && (cuenta.getMoneda() == TipoMoneda.PESOS || cuenta.getMoneda() == TipoMoneda.DOLARES)) || (cuenta.getTipoCuenta() == TipoCuenta.CUENTA_CORRIENTE && cuenta.getMoneda() == TipoMoneda.PESOS);
     }
 
     // Valido que el cliente no tenga cuentas del mismo tipo
-    private boolean cuentaMismoTipo(Cuenta cuenta, Set<Cuenta> set) {
+    private boolean cuentaYMonedaMismoTipo(Cuenta cuenta, Set<Cuenta> set) {
         for (Cuenta cuentaDelCliente : set) {
-            if (cuentaDelCliente.getTipoCuenta() == cuenta.getTipoCuenta()) {
+            if (cuentaDelCliente.getTipoCuenta() == cuenta.getTipoCuenta() && cuentaDelCliente.getMoneda() == cuenta.getMoneda()) {
                 return true;
             }
         }

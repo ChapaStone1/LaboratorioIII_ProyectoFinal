@@ -40,11 +40,9 @@ public class CuentaController {
                 TipoCuentaNotSupportedException, TipoMonedaNotSupportedException, 
                 ClienteNotExistException {
         
-        // Valida el DTO
         cuentaValidator.validar(cuentaDto);
         Cuenta cuenta = cuentaService.darDeAltaCuenta(cuentaDto);
       
-        // Retorna la cuenta con un estado HTTP 201 (Created)
         return new ResponseEntity<>(cuenta, HttpStatus.CREATED);
     }
 
