@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
+import java.util.Set;
 
 
 @RestController
@@ -55,7 +56,7 @@ public class CuentaController {
     }
 
     @GetMapping("/{idcliente}/cuentas")
-    public List<Cuenta> getCuentasCliente(@PathVariable("idcliente") long idcliente, WebRequest request) {
+    public Set<Cuenta> getCuentasCliente(@PathVariable("idcliente") long idcliente, WebRequest request) {
         return cuentaService.cuentasdeCliente(idcliente);
     }
 

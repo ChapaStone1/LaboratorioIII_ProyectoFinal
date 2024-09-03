@@ -1,11 +1,14 @@
 package ar.edu.utn.frbb.tup.persistence;
 
+import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.entity.CuentaEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class CuentaDao  extends AbstractBaseDao{
@@ -26,17 +29,19 @@ public class CuentaDao  extends AbstractBaseDao{
         return ((CuentaEntity) getInMemoryDatabase().get(id)).toCuenta();
     }
 
-    public List<Cuenta> getCuentasByCliente(long dni) {
-        List<Cuenta> cuentasDelCliente = new ArrayList<>();
-        for (Object object:
-                getInMemoryDatabase().values()) {
-            CuentaEntity cuenta = ((CuentaEntity) object);
-            if (cuenta.getTitular().equals(dni)) {
-                cuentasDelCliente.add(cuenta.toCuenta());
-            }
+    public Set<Cuenta> getCuentasByCliente(long dni) {
+    Set<Cuenta> cuentasDelCliente = new HashSet<>();
+    for (Object object : getInMemoryDatabase().values()) {
+        CuentaEntity cuenta = (CuentaEntity) object;
+        Cliente titular = cuenta.getTitular();
+        
+        // Verifica si titular es null antes de acceder a getDni()
+        if (titular != null && titular.getDni() == dni) {
+            cuentasDelCliente.add(cuenta.toCuenta());
         }
-        return cuentasDelCliente;
     }
+    return cuentasDelCliente;
+}
     
     public Cuenta findByNumeroCuenta(long numeroCuenta) {
         for (Object object : getInMemoryDatabase().values()) {

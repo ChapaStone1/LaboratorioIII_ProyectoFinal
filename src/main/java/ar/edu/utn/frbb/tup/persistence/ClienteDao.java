@@ -5,6 +5,7 @@ import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class ClienteDao extends AbstractBaseDao{
 
         // Si se solicita carga completa, añade las cuentas asociadas al cliente
         if (loadComplete) {
-            List<Cuenta> cuentas = cuentaDao.getCuentasByCliente(dni);
+            Set<Cuenta> cuentas = cuentaDao.getCuentasByCliente(dni);
             if (cuentas != null) {
                 for (Cuenta cuenta : cuentas) {
                     cliente.addCuenta(cuenta);

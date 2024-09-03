@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,8 +70,8 @@ public class CuentaService {
     }
 
     // Valido que el cliente no tenga cuentas del mismo tipo
-    private boolean cuentaMismoTipo(Cuenta cuenta, List<Cuenta> cuentasCliente) {
-        for (Cuenta cuentaDelCliente : cuentasCliente) {
+    private boolean cuentaMismoTipo(Cuenta cuenta, Set<Cuenta> set) {
+        for (Cuenta cuentaDelCliente : set) {
             if (cuentaDelCliente.getTipoCuenta() == cuenta.getTipoCuenta()) {
                 return true;
             }
@@ -78,9 +79,9 @@ public class CuentaService {
         return false;
     }
     // Creo metodo para que me devuelva la lista de un cliente, en caso de que no tenga me devuelve lista vacia
-    public List<Cuenta> cuentasdeCliente(long dni){
-        List<Cuenta> cuentas = cuentaDao.getCuentasByCliente(dni);
-        return cuentas != null ? cuentas : new ArrayList<>();
+    public Set<Cuenta> cuentasdeCliente(long dni){
+        Set<Cuenta> cuentas = cuentaDao.getCuentasByCliente(dni);
+        return cuentas != null ? cuentas : new HashSet<>();
     }
     // Retorno la lista de todas las cuentas de un cliente para el GET de cuentas de cliente
 
@@ -167,7 +168,7 @@ public class CuentaService {
     public RespuestaDto agregarMovimientoTransferencia(Cuenta cuenta, TipoMovimiento movimiento, double monto, long numCuentaOrigen, long numCuentaDestino){
         Movimiento movimientoNuevo = new Movimiento();
         RespuestaDto respuesta = new RespuestaDto();
-        movimientoNuevo.guardarMovimiento(cuenta, movimiento, monto, numCuentaOrigen, numCuentaDestino);
+        movimientoNuevo = movimientoNuevo.guardarMovimiento(cuenta, movimiento, monto, numCuentaOrigen, numCuentaDestino);
         respuesta.setEstado("EXITOSA");
         respuesta.setMensaje("Transferencia Exitosa. Número de transferencia: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
         return respuesta;
@@ -176,7 +177,7 @@ public class CuentaService {
     public RespuestaDto agregarMovimientoRetiro(Cuenta cuenta, double monto, long numCuentaOrigen){
         Movimiento movimientoNuevo = new Movimiento();
         RespuestaDto respuesta = new RespuestaDto();
-        movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.RETIRO, monto, numCuentaOrigen, numCuentaOrigen);
+        movimientoNuevo = movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.RETIRO, monto, numCuentaOrigen, numCuentaOrigen);
         respuesta.setEstado("EXITOSA");
         respuesta.setMensaje("Retiro Exitoso. Número de movimiento: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
         return respuesta;
@@ -185,7 +186,7 @@ public class CuentaService {
     public RespuestaDto agregarMovimientoDeposito(Cuenta cuenta, double monto, long numCuentaOrigen){
         Movimiento movimientoNuevo = new Movimiento();
         RespuestaDto respuesta = new RespuestaDto();
-        movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.DEPOSITO, monto, numCuentaOrigen, numCuentaOrigen);
+        movimientoNuevo = movimientoNuevo.guardarMovimiento(cuenta, TipoMovimiento.DEPOSITO, monto, numCuentaOrigen, numCuentaOrigen);
         respuesta.setEstado("EXITOSA");
         respuesta.setMensaje("Deposito Exitoso. Número de movimiento: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
         return respuesta;
