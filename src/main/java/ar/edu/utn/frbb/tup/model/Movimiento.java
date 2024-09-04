@@ -81,8 +81,9 @@ public class Movimiento {
         }
     }
     private long setNumeroMovimiento() {
-        return new Random().nextLong(9999) + 1000;
-    }   
+        Random random = new Random();
+        return 100000000L + random.nextLong(900000000L);
+    }  
 
     public Movimiento guardarMovimiento(Cuenta cuenta, TipoMovimiento tipo, double monto, long cuentaOrigen, long cuentaDestino) {
         LocalDateTime fecha = LocalDateTime.now();
