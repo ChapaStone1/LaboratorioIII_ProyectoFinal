@@ -36,10 +36,10 @@ public class ClienteService {
         if (cliente.getEdad() < 18) {
             throw new IllegalArgumentException("El cliente debe ser mayor a 18 años");
         }
-        if(!verazService.servicioDeVeraz(cliente.getDni())) {
+        if(verazService.servicioDeVeraz(cliente.getDni())) {
             throw new DeudorVerazException("El cliente con DNI " + cliente.getDni() + " se encuentra en deuda con Veraz");
         }
-        if(!interpolService.pedidoCapturaInternacional(cliente.getDni())) {
+        if(interpolService.pedidoCapturaInternacional(cliente.getDni())) {
             throw new CapturaInternacionalException("El cliente con DNI " + cliente.getDni() + " se encuentra en captura internacional");
         }
 

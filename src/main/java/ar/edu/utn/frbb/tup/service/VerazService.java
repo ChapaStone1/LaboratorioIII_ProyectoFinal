@@ -6,15 +6,12 @@ public class VerazService {
 
     // Método principal que verifica el DNI
     public boolean servicioDeVeraz(long dni) {
-        // Si el DNI es primo, retorna false
         if (esPrimo(dni)) {
-            return false;
+            return true;
         }
-        // Caso contrario, retorna true
-        return true;
+        return false;
     }
 
-    // Método auxiliar que verifica si un número es primo
     private boolean esPrimo(long numero) {
         if (numero <= 1) {
             return false;

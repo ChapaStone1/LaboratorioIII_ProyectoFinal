@@ -28,7 +28,7 @@ public class RetirosService {
         }
 
         if (!cuenta.getMoneda().equals(TipoMoneda.fromString(retiroDto.getMoneda()))) {
-            throw new TipoMonedaInvalidoException("Las monedas del deposito y la cuenta no coinciden");
+            throw new TipoMonedaInvalidoException("Las monedas del retiro y la cuenta no coinciden");
         }
         if (cuenta.getBalance() < retiroDto.getMonto()) {
             throw new NoAlcanzaException("El saldo de la cuenta es insuficiente");
