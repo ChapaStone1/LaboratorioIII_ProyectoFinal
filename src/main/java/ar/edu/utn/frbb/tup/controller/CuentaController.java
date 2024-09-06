@@ -13,7 +13,6 @@ import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.dto.MovimientosDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -35,15 +34,9 @@ public class CuentaController {
     private MovimientosService movimientoService;
 
     @PostMapping
-    public ResponseEntity<Cuenta> crearCuenta(@RequestBody CuentaDto cuentaDto, WebRequest request) 
-            throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, 
-                TipoCuentaNotSupportedException, TipoMonedaNotSupportedException, 
-                ClienteNotExistException {
-        
+    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto, WebRequest request)  throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, TipoMonedaNotSupportedException, ClienteNotExistException {
         cuentaValidator.validar(cuentaDto);
-        Cuenta cuenta = cuentaService.darDeAltaCuenta(cuentaDto);
-      
-        return new ResponseEntity<>(cuenta, HttpStatus.CREATED);
+        return cuentaService.darDeAltaCuenta(cuentaDto);
     }
 
     @GetMapping("/{idCuenta}")

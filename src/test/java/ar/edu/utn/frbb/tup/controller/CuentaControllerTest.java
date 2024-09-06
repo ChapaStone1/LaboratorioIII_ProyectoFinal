@@ -39,18 +39,17 @@ public class CuentaControllerTest {
     private CuentaController cuentaController;
 
     @Test
-    public void testCrearCuentaSuccess(){
+    public void testCrearCuentaSuccess() {
         CuentaDto cuentaDto = cuentaDtoMock(); // Mock de CuentaDto
         Cuenta cuenta = cuentaMock(); // Mock de Cuenta
 
         doNothing().when(cuentaValidator).validar(cuentaDto);
         when(cuentaService.darDeAltaCuenta(cuentaDto)).thenReturn(cuenta);
 
-        ResponseEntity<Cuenta> response = cuentaController.crearCuenta(cuentaDto, null);
+        Cuenta response = cuentaController.crearCuenta(cuentaDto, null); // Ahora retorna directamente una Cuenta
 
         assertNotNull(response); // Verificamos que la respuesta no sea nula
-        assertEquals(HttpStatus.CREATED, response.getStatusCode()); // Verificamos que el código de respuesta sea CREATED
-        assertEquals(cuenta, response.getBody()); // Verificamos que la cuenta en la respuesta sea la misma que el mock
+        assertEquals(cuenta, response); // Verificamos que la cuenta devuelta sea la misma que el mock
         verify(cuentaValidator).validar(cuentaDto); // Verificamos que el validador fue llamado
         verify(cuentaService).darDeAltaCuenta(cuentaDto); // Verificamos que el servicio fue llamado
     }

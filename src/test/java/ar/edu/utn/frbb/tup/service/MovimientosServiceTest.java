@@ -48,6 +48,7 @@ public class MovimientosServiceTest {
     public void testBuscarMovimientosPorCuentaNoExistCuenta(){
         when(cuentaDao.findByNumeroCuenta(37389808)).thenReturn(null);
         NotExistCuentaException thrown = assertThrows(NotExistCuentaException.class, () -> movimientosService.buscarMovimientosPorCuentaId(37389808));
+        assertNotNull(thrown.getMessage());
     }
 
     private Cuenta cuentaMock(){
