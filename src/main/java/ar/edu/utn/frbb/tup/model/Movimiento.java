@@ -80,7 +80,7 @@ public class Movimiento {
                 return "Movimiento desconocido";
         }
     }
-    private long setNumeroMovimiento() {
+    public long setNumeroMovimiento() {
         Random random = new Random();
         return 100000000L + random.nextLong(900000000L);
     }  

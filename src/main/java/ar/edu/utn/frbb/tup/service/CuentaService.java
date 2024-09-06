@@ -130,6 +130,7 @@ public class CuentaService {
     public void actualizarCuenta(Cuenta cuenta){
         cuentaDao.actualizarCuenta(cuenta);
     }
+
     public void actualizarBalance(Cuenta cuenta, double nuevoBalance, TipoMovimiento movimiento) throws ClienteNotExistException{
         if (cuenta.getTitular() == null) {
             throw new IllegalStateException("La cuenta no tiene un titular asignado.");
@@ -145,9 +146,9 @@ public class CuentaService {
         } else {
             throw new ClienteNotExistException("El cliente con DNI " + cuenta.getTitular().getDni() + " no existe.");
         }
-
         actualizarCuentaEnCliente(clienteOrigen, cuenta);
     }
+
     private void actualizarCuentaEnCliente(Cliente cliente, Cuenta cuentaActualizada) {
         if (cliente != null) {
             Set<Cuenta> cuentas = cliente.getCuentas();
