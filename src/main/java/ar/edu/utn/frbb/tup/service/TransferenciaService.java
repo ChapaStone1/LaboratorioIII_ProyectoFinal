@@ -64,8 +64,8 @@ public class TransferenciaService {
             cuentaService.actualizarBalance(cuentaDestino, balanceCuentaDestino, TipoMovimiento.TRANSFERENCIA);
 
             // Creo y agrego los movimientos para ambas cuentas
-            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
-            cuentaService.agregarMovimientoTransferencia(cuentaDestino, TipoMovimiento.TRANSFERENCIA, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+            cuentaService.agregarMovimientoTransferencia(cuentaDestino, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
 
             // Actualizo las cuentas en la base de datos
             cuentaService.actualizarCuenta(cuentaOrigen);
@@ -91,7 +91,7 @@ public class TransferenciaService {
             // actualizo los balances en cuentaService
             cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
             // Creo y agrego los movimientos para ambas cuentas
-            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
+            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
             // Actualizo las cuentas en la base de datos
             cuentaService.actualizarCuenta(cuentaOrigen);
             // retorno la respuesta

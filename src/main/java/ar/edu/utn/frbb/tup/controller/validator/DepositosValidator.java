@@ -17,32 +17,30 @@ public class DepositosValidator {
         String nroCuentaString = String.valueOf(numeroCuenta);
 
         if(nroCuentaString.length() > 8) {
-            throw new IllegalArgumentException("El NUMERO DE CUENTA ingresado no es valido.");
+            throw new IllegalArgumentException("Numero de cuenta no valido.");
 
         }
 
         if (!nroCuentaString.matches("\\d{1,8}")) {
-            throw new IllegalArgumentException("El NUMERO DE CUENTA ingresado no es valido.");
+            throw new IllegalArgumentException("Numero de cuenta no valido.");
         }
     }
 
     public void validarMonto(double monto) throws InputErrorException {
         if (monto <= 0) {
-            throw new InputErrorException("El MONTO ingresado no es valido.");
+            throw new InputErrorException("Monto no valido.");
         }
 
         try{
             Double.parseDouble(String.valueOf(monto));
         }catch (NumberFormatException e){
-            throw new IllegalArgumentException("El MONTO ingresado no es valido.");
+            throw new IllegalArgumentException("Monto no valido.");
         }
     }
 
     public void validarMoneda(String moneda) throws InputErrorException {
         if (!"P".equalsIgnoreCase(moneda) && !"D".equalsIgnoreCase(moneda)) {
-            throw new InputErrorException("El TIPO DE MONEDA ingresado no es valido.");
+            throw new InputErrorException("Tipo de moneda no valido.");
         }
     }
-
-
 }

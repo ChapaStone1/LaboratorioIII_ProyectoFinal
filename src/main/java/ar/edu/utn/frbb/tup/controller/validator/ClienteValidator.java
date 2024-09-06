@@ -42,8 +42,6 @@ public class ClienteValidator {
             if (fechaNacimiento.isAfter(fechaActual)) {
                 throw new InputErrorException("Fecha de nacimiento inválida, está en el futuro.");
             }
-
-
         }  catch (DateTimeParseException | InputErrorException e) {
             throw new IllegalArgumentException("Fecha de nacimiento inválida, debe tener el formato: yyyy-MM-dd.");
         }
@@ -67,6 +65,5 @@ public class ClienteValidator {
         if (dni > 99999999) {
             throw new IllegalArgumentException("El DNI no es correcto");
         }
-        
     }
 }

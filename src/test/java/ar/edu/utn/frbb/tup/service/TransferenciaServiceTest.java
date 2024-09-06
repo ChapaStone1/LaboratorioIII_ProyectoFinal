@@ -46,17 +46,17 @@ public class TransferenciaServiceTest {
         when(cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), 0.0)).thenReturn(4000.0);
         when(cuentaService.balanceCuentaDestino(cuentaDestino.getBalance(), transferenciaDto.getMonto(), 0.0)).thenReturn(1000.0);
         //Que retorne un movimiento mock al final
-        when(cuentaService.agregarMovimientoTransferencia(any(Cuenta.class), any(TipoMovimiento.class), anyDouble(), anyLong(), anyLong())).thenReturn(respuestaEsperada);
+        when(cuentaService.agregarMovimientoTransferencia(any(Cuenta.class), anyDouble(), anyLong(), anyLong())).thenReturn(respuestaEsperada);
 
-        // Ejecutar el método a probar
+        // Ejecutar el método
         RespuestaDto respuesta = transferenciaService.realizarTransferencia(transferenciaDto);
 
         // Verificar resultados
         assertEquals(respuestaEsperada, respuesta);
         verify(cuentaService, times(1)).actualizarBalance(cuentaOrigen, 4000.0, TipoMovimiento.TRANSFERENCIA);
         verify(cuentaService, times(1)).actualizarBalance(cuentaDestino, 1000.0, TipoMovimiento.TRANSFERENCIA);
-        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, 1000.0, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
-        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaDestino, TipoMovimiento.TRANSFERENCIA, 1000.0, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaOrigen, 1000.0, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaDestino, 1000.0, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
     }
 
     @Test
@@ -72,14 +72,14 @@ public class TransferenciaServiceTest {
         when(cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), 0.0)).thenReturn(4000.0);
 
         // Configurar movimiento
-        when(cuentaService.agregarMovimientoTransferencia(any(Cuenta.class), any(TipoMovimiento.class), anyDouble(), anyLong(), anyLong())).thenReturn(respuestaEsperada);
+        when(cuentaService.agregarMovimientoTransferencia(any(Cuenta.class), anyDouble(), anyLong(), anyLong())).thenReturn(respuestaEsperada);
 
         RespuestaDto respuesta = transferenciaService.realizarTransferencia(transferenciaDto);
 
         // Verifico que los resultados sean los esperados
         assertEquals(respuestaEsperada, respuesta);
         verify(cuentaService, times(1)).actualizarBalance(cuentaOrigen, 4000.0, TipoMovimiento.TRANSFERENCIA);
-        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaOrigen, TipoMovimiento.TRANSFERENCIA, 1000.0, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
+        verify(cuentaService, times(1)).agregarMovimientoTransferencia(cuentaOrigen, 1000.0, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
     }
 
     @Test
@@ -102,14 +102,13 @@ public class TransferenciaServiceTest {
         assertEquals(respuestaEsperada.getMensaje(), respuesta.getMensaje());
         // Verifico que no se invoque nunca a los metodos de actualizar balance ni agregar movimiento
         verify(cuentaService, times(0)).actualizarBalance(any(Cuenta.class), anyDouble(), any(TipoMovimiento.class));
-        verify(cuentaService, times(0)).agregarMovimientoTransferencia(any(Cuenta.class), any(TipoMovimiento.class), anyDouble(), anyLong(), anyLong());
+        verify(cuentaService, times(0)).agregarMovimientoTransferencia(any(Cuenta.class), anyDouble(), anyLong(), anyLong());
     }
 
 
     @Test
     public void testRealizarTransferenciaCuentaNoExiste() {
         TransferenciasDto transferenciaDto = mockTransferenciaDto();
-        Cuenta cuentaOrigen = cuentaOrigenMock();
         when(cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaOrigen())).thenReturn(null);
 
         // Ejecutar el método y verificar excepción
@@ -150,7 +149,7 @@ public class TransferenciaServiceTest {
         assertEquals(respuestaEsperada.getMensaje(), respuesta.getMensaje());
         // Verifico que no se invoque nunca a los metodos de actualizar balance ni agregar movimiento
         verify(cuentaService, times(0)).actualizarBalance(any(Cuenta.class), anyDouble(), any(TipoMovimiento.class));
-        verify(cuentaService, times(0)).agregarMovimientoTransferencia(any(Cuenta.class), any(TipoMovimiento.class), anyDouble(), anyLong(), anyLong());
+        verify(cuentaService, times(0)).agregarMovimientoTransferencia(any(Cuenta.class), anyDouble(), anyLong(), anyLong());
     }
 
     // Clientes y cuentas Mock

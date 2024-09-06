@@ -163,10 +163,10 @@ public class CuentaService {
     }
 
     // metodos para agregar movimientos al historial
-    public RespuestaDto agregarMovimientoTransferencia(Cuenta cuenta, TipoMovimiento movimiento, double monto, long numCuentaOrigen, long numCuentaDestino){
+    public RespuestaDto agregarMovimientoTransferencia(Cuenta cuenta, double monto, long numCuentaOrigen, long numCuentaDestino){
         Movimiento movimientoNuevo = new Movimiento();
         RespuestaDto respuesta = new RespuestaDto();
-        movimientoNuevo = movimientoNuevo.guardarMovimiento(cuenta, movimiento, monto, numCuentaOrigen, numCuentaDestino);
+        movimientoNuevo = movimientoNuevo.guardarMovimiento(cuenta,TipoMovimiento.TRANSFERENCIA, monto, numCuentaOrigen, numCuentaDestino);
         respuesta.setEstado("EXITOSA");
         respuesta.setMensaje("Transferencia Exitosa. Número de transferencia: " + movimientoNuevo.getNumMovimiento() + ". Realizado el " + movimientoNuevo.getFecha());
         return respuesta;

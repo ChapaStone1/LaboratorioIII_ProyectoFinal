@@ -21,10 +21,9 @@ public class BanelcoServiceTest {
 
     @Test
     public void testServicioDeBanelcoCuentaDestinoPar() {
-        // Configurar el mock para devolver un valor par
+        // True si es numero par el numero de cuenta destino
         when(transferenciaDto.getCuentaDestino()).thenReturn(2203200322L);
 
-        // Ejecutar el método a probar
         boolean result = banelcoService.servicioDeBanelco(transferenciaDto);
 
         // Verificar el resultado esperado
@@ -33,10 +32,9 @@ public class BanelcoServiceTest {
 
     @Test
     public void testServicioDeBanelcoCuentaDestinoImpar() {
-        // Configurar el mock para devolver un valor impar
+        // False si es numero impar el numero de cuenta destino
         when(transferenciaDto.getCuentaDestino()).thenReturn(22032003223L);
 
-        // Ejecutar el método a probar
         boolean result = banelcoService.servicioDeBanelco(transferenciaDto);
 
         // Verificar el resultado esperado

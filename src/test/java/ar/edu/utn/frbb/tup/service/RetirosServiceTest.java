@@ -68,7 +68,6 @@ public class RetirosServiceTest {
     public void testRealizarRetiroCuentaNoExiste() {
         RetirosDto retiroDto = mockRetiroDto();
 
-        // Configurar el mock
         when(cuentaService.buscarCuentaPorNumeroCuenta(retiroDto.getCuenta())).thenReturn(null);
 
         // Ejecutar el método y verificar excepción
@@ -87,7 +86,7 @@ public class RetirosServiceTest {
     }
 
 
-    //clientes y cuentas Mock
+    // Objetos mock
     private Cliente clienteMock(){
         Cliente cliente = new Cliente();
         cliente.setDni(37389808);

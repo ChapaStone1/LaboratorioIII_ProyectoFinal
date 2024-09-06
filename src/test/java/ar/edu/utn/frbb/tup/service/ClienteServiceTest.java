@@ -92,7 +92,7 @@ public class ClienteServiceTest {
     @Test
     public void testClienteCapturaInternacionalExcepcion() throws CapturaInternacionalException{
         ClienteDto cliente = clienteDtoMock();
-        //Puse al profe con pedido de captura nomas
+        //Puse al profe Salotto con pedido de captura nomas
         cliente.setDni(26456437);
 
         when(clienteDao.find(cliente.getDni(), false)).thenReturn(null);
@@ -106,6 +106,7 @@ public class ClienteServiceTest {
     public void testClienteTieneDeudaVeraz() throws DeudorVerazException{
         ClienteDto cliente = clienteDtoMock();
         cliente.setDni(10000019);
+
         // Para ser deudor de veraz el DNI debe ser numero primo
         when(clienteDao.find(cliente.getDni(), false)).thenReturn(null);
         when(verazService.servicioDeVeraz(cliente.getDni())).thenReturn(true);
@@ -121,7 +122,6 @@ public class ClienteServiceTest {
 
         when(clienteDao.find(37389808, true)).thenReturn(cliente);  // Simular búsqueda exitosa del cliente
 
-        // Llamar al método que se está probando
         clienteService.agregarCuenta(cuenta, 37389808);
 
         // Verificar que se llamó a guardar el cliente actualizado en la base de datos
@@ -135,7 +135,7 @@ public class ClienteServiceTest {
 
         when(clienteDao.find(37389808, true)).thenReturn(null);  // Simular búsqueda nula del cliente
 
-        assertThrows(IllegalArgumentException.class, () -> clienteService.agregarCuenta(cuenta, clienteMock().getDni()));
+        assertThrows(IllegalArgumentException.class, () -> clienteService.agregarCuenta(cuenta, cliente.getDni()));
     }
 
     //clientes y cuentas Mock

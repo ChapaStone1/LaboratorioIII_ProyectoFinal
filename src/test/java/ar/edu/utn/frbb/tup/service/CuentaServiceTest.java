@@ -56,7 +56,6 @@ public class CuentaServiceTest {
         // Simular que el cliente no tiene cuentas previas del mismo tipo
         when(cuentaDao.getCuentasByCliente(cuentaDtoMock.getDni())).thenReturn(new HashSet<>());
 
-        // Llamar al método de servicio para dar de alta la cuenta
         Cuenta cuentaCreada = cuentaService.darDeAltaCuenta(cuentaDtoMock);
 
         // Verificar que el método save del DAO se haya llamado
@@ -97,7 +96,6 @@ public class CuentaServiceTest {
         // Simulación: El cliente tiene cuentas
         when(cuentaDao.getCuentasByCliente(dni)).thenReturn(cuentasMock);
 
-        // Llamar al método cuentasdeCliente
         Set<Cuenta> resultado = cuentaService.cuentasdeCliente(dni);
 
         // Verificar que el resultado contiene las cuentas mock
@@ -112,22 +110,20 @@ public class CuentaServiceTest {
         // Simulación: El cliente no tiene cuentas (se devuelve null)
         when(cuentaDao.getCuentasByCliente(dni)).thenReturn(null);
 
-        // Llamar al método cuentasdeCliente
         Set<Cuenta> resultado = cuentaService.cuentasdeCliente(dni);
 
         // Verificar que el resultado es un conjunto vacío
         assertTrue(resultado.isEmpty());
         verify(cuentaDao, times(1)).getCuentasByCliente(dni);
     }
+
     @Test
     public void testBuscarCuentaPorNumeroCuentaSuccess() throws NotExistCuentaException {
         long numeroCuenta = 231341546L;
-        Cuenta cuentaMock = cuentaMock(); // Usa un mock de la cuenta para el test
-
+        Cuenta cuentaMock = cuentaMock(); 
         // Simulación: El número de cuenta existe en la base de datos
         when(cuentaDao.findByNumeroCuenta(numeroCuenta)).thenReturn(cuentaMock);
 
-        // Llamar al método
         Cuenta cuentaResultado = cuentaService.buscarCuentaPorNumeroCuenta(numeroCuenta);
 
         // Verificar que el resultado no sea null y sea igual a la cuenta mock
@@ -140,7 +136,6 @@ public class CuentaServiceTest {
 
     @Test
     public void testCalcularComisionPesosMontoMayorA1000000() {
-        // Llamar al método
         double comision = cuentaService.calcularComision(TipoMoneda.PESOS, 10000000.0);
 
         // Calcular la comisión esperada
@@ -152,7 +147,6 @@ public class CuentaServiceTest {
 
     @Test
     public void testActualizarBalanceSuccess() throws ClienteNotExistException {
-        // Datos de prueba
         Cuenta cuenta = cuentaMock();
         double nuevoBalance = 5000.0;
         TipoMovimiento movimiento = TipoMovimiento.DEPOSITO;
@@ -162,7 +156,6 @@ public class CuentaServiceTest {
         when(clienteDao.find(clienteMock.getDni(), true)).thenReturn(clienteMock);
         doNothing().when(cuentaDao).actualizarCuenta(cuenta);
 
-        // Llamar al método
         cuentaService.actualizarBalance(cuenta, nuevoBalance, movimiento);
 
         // Verificar las interacciones con los mocks
@@ -174,13 +167,12 @@ public class CuentaServiceTest {
     @Test
     public void testAgregarMovimientoTransferencia() {
         Cuenta cuenta = cuentaMock();
-        TipoMovimiento tipoMovimiento = TipoMovimiento.TRANSFERENCIA;
+
         double monto = 1000.0;
         long numCuentaOrigen = 231341546;
         long numCuentaDestino = 987654321;
 
-        // Ejecutar el método a probar
-        RespuestaDto respuesta = cuentaService.agregarMovimientoTransferencia(cuenta, tipoMovimiento, monto, numCuentaOrigen, numCuentaDestino);
+        RespuestaDto respuesta = cuentaService.agregarMovimientoTransferencia(cuenta, monto, numCuentaOrigen, numCuentaDestino);
 
         // Verificar resultados
         assertEquals("EXITOSA", respuesta.getEstado()); // Ajusta según la respuesta esperada
@@ -192,9 +184,7 @@ public class CuentaServiceTest {
         Cuenta cuenta = cuentaMock();
         double monto = 1000.0;
         long numCuentaOrigen = 231341546;
-        long numCuentaDestino = 987654321;
 
-        // Ejecutar el método a probar
         RespuestaDto respuesta = cuentaService.agregarMovimientoRetiro(cuenta, monto, numCuentaOrigen);
 
         // Verificar resultados
@@ -207,9 +197,7 @@ public class CuentaServiceTest {
         Cuenta cuenta = cuentaMock();
         double monto = 1000.0;
         long numCuentaOrigen = 231341546;
-        long numCuentaDestino = 987654321;
 
-        // Ejecutar el método a probar
         RespuestaDto respuesta = cuentaService.agregarMovimientoDeposito(cuenta, monto, numCuentaOrigen);
 
         // Verificar resultados
@@ -218,8 +206,7 @@ public class CuentaServiceTest {
         assertNotNull(respuesta.getMensaje());
     }
 
-
-
+    // Objetos Mock
     private Cliente clienteMock(){
         Cliente cliente = new Cliente();
         cliente.setDni(37389808);
@@ -252,6 +239,4 @@ public class CuentaServiceTest {
         cuentaDto.setMoneda("P");
         return cuentaDto;
     }
-
-    
 }

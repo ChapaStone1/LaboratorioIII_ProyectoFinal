@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InterpolServiceTest {
     @InjectMocks
     private InterpolService interpolService;
+    
     @Test
     public void testPedidoCapturaInternacional_True() {
         long dniConCaptura = 26456437;
@@ -27,6 +28,4 @@ public class InterpolServiceTest {
         boolean resultado = interpolService.pedidoCapturaInternacional(dniSinCaptura);
         assertFalse(resultado, "Se esperaba que el DNI " + dniSinCaptura + " no tenga pedido de captura internacional.");
     }
-
-    
 }

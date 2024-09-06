@@ -24,6 +24,7 @@ public class DepositosController {
     @Autowired
     private DepositosValidator depositoValidator;
 
+
     @PostMapping
     public RespuestaDto realizarDeposito(@RequestBody DepositosDto depositoDto) throws TipoMonedaInvalidoException, InputErrorException, NotExistCuentaException, ClienteNotExistException {
         depositoValidator.validar(depositoDto);

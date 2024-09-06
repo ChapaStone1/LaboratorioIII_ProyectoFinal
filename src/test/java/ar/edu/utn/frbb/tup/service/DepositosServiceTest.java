@@ -60,7 +60,6 @@ public class DepositosServiceTest {
         // Configurar el mock
         when(cuentaService.buscarCuentaPorNumeroCuenta(depositoDto.getCuenta())).thenReturn(null);
 
-        // Ejecutar el método y verificar excepción
         assertThrows(NotExistCuentaException.class, () -> depositosService.realizarDeposito(depositoDto));
     }
 
