@@ -42,6 +42,9 @@ public class CuentaController {
     @GetMapping("/{idCuenta}")
     public Cuenta mostrarCuenta(@PathVariable("idCuenta") long idCuenta, WebRequest request) throws NotExistCuentaException {
         Cuenta cuenta = cuentaService.buscarCuentaPorNumeroCuenta(idCuenta);
+        if (cuenta == null) {
+            throw new NotExistCuentaException("La cuenta no existe");
+        }
         return cuenta;
     }
 

@@ -8,6 +8,7 @@ import ar.edu.utn.frbb.tup.controller.dto.TransferenciasDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoMovimiento;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistException;
+import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.NotExistCuentaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoDeCuentasException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaNotSupportedException;
@@ -21,13 +22,15 @@ public class TransferenciaService {
     @Autowired
     private BanelcoService banelcoService;
 
-    public RespuestaDto realizarTransferencia(TransferenciasDto transferenciaDto) throws NotExistCuentaException, NotExistCuentaException, TipoDeCuentasException, TipoMonedaNotSupportedException, ClienteNotExistException{
+    public RespuestaDto realizarTransferencia(TransferenciasDto transferenciaDto) throws NotExistCuentaException, TipoDeCuentasException, TipoMonedaNotSupportedException, ClienteNotExistException, NoAlcanzaException{
         // Obtener las cuentas
         Cuenta cuentaOrigen = cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaOrigen());
         if (cuentaOrigen == null) {
             throw new NotExistCuentaException("La cuenta " + transferenciaDto.getCuentaOrigen() + " (cuenta de origen) no existe.");
         }
-
+        if(cuentaOrigen.getBalance()<=transferenciaDto.getMonto()){
+            throw new NoAlcanzaException("Saldo insuficiente para realizar la transferencia.");
+        }
         Cuenta cuentaDestino = cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaDestino());
         if (cuentaDestino == null) {
             if (banelcoService.servicioDeBanelco(transferenciaDto)) {
@@ -49,58 +52,42 @@ public class TransferenciaService {
    
     private RespuestaDto transferirMismoBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen, Cuenta cuentaDestino) throws ClienteNotExistException {
         RespuestaDto respuesta = new RespuestaDto();
+        // calculo la comision en cuentaservice
+        double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
 
-        if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
+        //calculo los balances en cuentaService
+        double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
+        double balanceCuentaDestino = cuentaService.balanceCuentaDestino(cuentaDestino.getBalance(), transferenciaDto.getMonto(), comision);
 
-            // calculo la comision en cuentaservice
-            double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
+        // actualizo los balances en cuentaService
+        cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
+        cuentaService.actualizarBalance(cuentaDestino, balanceCuentaDestino, TipoMovimiento.TRANSFERENCIA);
 
-            //calculo los balances en cuentaService
-            double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
-            double balanceCuentaDestino = cuentaService.balanceCuentaDestino(cuentaDestino.getBalance(), transferenciaDto.getMonto(), comision);
+        // Creo y agrego los movimientos para ambas cuentas
+        respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
+        cuentaService.agregarMovimientoTransferencia(cuentaDestino, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
 
-            // actualizo los balances en cuentaService
-            cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
-            cuentaService.actualizarBalance(cuentaDestino, balanceCuentaDestino, TipoMovimiento.TRANSFERENCIA);
-
-            // Creo y agrego los movimientos para ambas cuentas
-            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
-            cuentaService.agregarMovimientoTransferencia(cuentaDestino, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), cuentaDestino.getNumeroCuenta());
-
-            // Actualizo las cuentas en la base de datos
-            cuentaService.actualizarCuenta(cuentaOrigen);
-            cuentaService.actualizarCuenta(cuentaDestino);
-            
-            // retorno la respuesta
-            return respuesta;
-        } 
-        else {
-            respuesta.setEstado("FALLIDA");
-            respuesta.setMensaje("Saldo insuficiente para realizar la transferencia.");
-            return respuesta;
-        }
+        // Actualizo las cuentas en la base de datos
+        cuentaService.actualizarCuenta(cuentaOrigen);
+        cuentaService.actualizarCuenta(cuentaDestino);
+        
+        // retorno la respuesta
+        return respuesta;
     } 
 
     private RespuestaDto transferirOtroBanco(TransferenciasDto transferenciaDto, Cuenta cuentaOrigen) throws ClienteNotExistException {
         RespuestaDto respuesta = new RespuestaDto();
-        if (cuentaOrigen.getBalance() >= transferenciaDto.getMonto()) {
-            // calculo la comision en cuentaservice
-            double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
-            //calculo el nuevo balance en cuentaService
-            double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
-            // actualizo los balances en cuentaService
-            cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
-            // Creo y agrego los movimientos para ambas cuentas
-            respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
-            // Actualizo las cuentas en la base de datos
-            cuentaService.actualizarCuenta(cuentaOrigen);
-            // retorno la respuesta
-            return respuesta;
-        }
-        else{
-            respuesta.setEstado("FALLIDA");
-            respuesta.setMensaje("Saldo insuficiente para realizar la transferencia.");
-            return respuesta;
-        }
+        // calculo la comision en cuentaservice
+        double comision = cuentaService.calcularComision(cuentaOrigen.getMoneda(), transferenciaDto.getMonto());
+        //calculo el nuevo balance en cuentaService
+        double balanceCuentaOrigen = cuentaService.balanceCuentaOrigen(cuentaOrigen.getBalance(), transferenciaDto.getMonto(), comision);
+        // actualizo los balances en cuentaService
+        cuentaService.actualizarBalance(cuentaOrigen, balanceCuentaOrigen, TipoMovimiento.TRANSFERENCIA);
+        // Creo y agrego los movimientos para ambas cuentas
+        respuesta = cuentaService.agregarMovimientoTransferencia(cuentaOrigen, transferenciaDto.getMonto()-comision, cuentaOrigen.getNumeroCuenta(), transferenciaDto.getCuentaDestino());
+        // Actualizo las cuentas en la base de datos
+        cuentaService.actualizarCuenta(cuentaOrigen);
+        // retorno la respuesta
+        return respuesta;
     }
 }

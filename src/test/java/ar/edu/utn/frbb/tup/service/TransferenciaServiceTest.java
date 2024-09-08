@@ -129,28 +129,15 @@ public class TransferenciaServiceTest {
     }
 
     @Test
-    public void testTransferenciaNoAlcanzaDineroCuenta() throws Exception {
-        TransferenciasDto transferenciaDto = mockTransferenciaDto();
-        Cuenta cuentaOrigen = cuentaOrigenMock();
-        Cuenta cuentaDestino = cuentaDestinoMock();
-        // Le hago un set de balance en 50, sabiendo que el monto de transferenciasDto es 1000
-        cuentaOrigen.setBalance(50.0);
-        RespuestaDto respuestaEsperada = mockRespuesta();
-        respuestaEsperada.setEstado("FALLIDA");
-        respuestaEsperada.setMensaje("Saldo insuficiente para realizar la transferencia.");
-        //Retornos de cuentas
-        when(cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaOrigen())).thenReturn(cuentaOrigen);
-        when(cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaDestino())).thenReturn(cuentaDestino);
-
-        RespuestaDto respuesta = transferenciaService.realizarTransferencia(transferenciaDto);
-
-        // Verifico que los campos de respuesta sean iguales
-        assertEquals(respuestaEsperada.getEstado(), respuesta.getEstado());
-        assertEquals(respuestaEsperada.getMensaje(), respuesta.getMensaje());
-        // Verifico que no se invoque nunca a los metodos de actualizar balance ni agregar movimiento
-        verify(cuentaService, times(0)).actualizarBalance(any(Cuenta.class), anyDouble(), any(TipoMovimiento.class));
-        verify(cuentaService, times(0)).agregarMovimientoTransferencia(any(Cuenta.class), anyDouble(), anyLong(), anyLong());
-    }
+public void testTransferenciaNoAlcanzaDineroCuenta() {
+    TransferenciasDto transferenciaDto = mockTransferenciaDto();
+    Cuenta cuentaOrigen = cuentaOrigenMock();
+    cuentaOrigen.setBalance(500); // Balance menor que el monto de la transferencia
+    when(cuentaService.buscarCuentaPorNumeroCuenta(transferenciaDto.getCuentaOrigen())).thenReturn(cuentaOrigen);
+    
+    // Ejecutar el método y verificar que lanza la excepción NoAlcanzaException
+    assertThrows(NoAlcanzaException.class, () -> transferenciaService.realizarTransferencia(transferenciaDto));
+}
 
     // Clientes y cuentas Mock
     private Cuenta cuentaOrigenMock(){

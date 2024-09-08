@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.InputErrorException;
+import ar.edu.utn.frbb.tup.model.exception.TipoPersonaException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -49,12 +50,12 @@ public class ClienteValidator {
 
     public void validateTipoPersona(ClienteDto clienteDto) {
         if (clienteDto.getTipoPersona() == null) {
-            throw new IllegalArgumentException("El tipo de persona no puede ser nulo");
+            throw new TipoPersonaException("El tipo de persona no puede ser nulo");
         }
         try {
             TipoPersona.fromString(clienteDto.getTipoPersona());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("El tipo de persona no es correcto");
+            throw new TipoPersonaException("El tipo de persona no es correcto");
         }
     }
     
