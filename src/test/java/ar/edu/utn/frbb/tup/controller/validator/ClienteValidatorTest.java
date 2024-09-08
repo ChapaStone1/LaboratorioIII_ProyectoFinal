@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.controller.validator;
 
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 
+import ar.edu.utn.frbb.tup.model.exception.TipoPersonaException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -45,7 +46,7 @@ public class ClienteValidatorTest {
         ClienteDto clienteDto = clienteDtoMock();
         clienteDto.setTipoPersona("X"); // Asignamos un tipo de persona inválido
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        TipoPersonaException exception = assertThrows(TipoPersonaException.class, () -> {
             clienteValidator.validar(clienteDto);
         });
         assertEquals("El tipo de persona no es correcto", exception.getMessage());

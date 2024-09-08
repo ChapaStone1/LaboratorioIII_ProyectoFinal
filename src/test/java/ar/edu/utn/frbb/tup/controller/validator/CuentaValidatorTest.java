@@ -1,6 +1,8 @@
 package ar.edu.utn.frbb.tup.controller.validator;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
+import ar.edu.utn.frbb.tup.model.exception.TipoMonedaInvalidoException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -32,7 +34,7 @@ public class CuentaValidatorTest {
         CuentaDto cuentaDto = cuentaDtoMock();
         cuentaDto.setTipoCuenta("CX"); // Tipo de cuenta invalido
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        TipoCuentaNotSupportedException exception = assertThrows(TipoCuentaNotSupportedException.class, () -> {
             cuentaValidator.validar(cuentaDto);
         });
         assertEquals("El tipo de cuenta no es correcto", exception.getMessage());
@@ -43,7 +45,7 @@ public class CuentaValidatorTest {
         CuentaDto cuentaDto = cuentaDtoMock();
         cuentaDto.setMoneda("E");
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        TipoMonedaInvalidoException exception = assertThrows(TipoMonedaInvalidoException.class, () -> {
             cuentaValidator.validar(cuentaDto);
         });
         assertEquals("El tipo de moneda no es correcto", exception.getMessage());

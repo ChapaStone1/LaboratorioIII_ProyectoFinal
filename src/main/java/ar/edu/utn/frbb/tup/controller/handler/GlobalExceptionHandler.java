@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -102,5 +103,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvocationTargetException.class)
     public ResponseEntity<CustomApiError> handleInvocationTargetException(InvocationTargetException ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error al invocar el método: " + ex.getTargetException().getMessage());
+    }
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<CustomApiError> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        CustomApiError apiError = new CustomApiError();
+        apiError.setErrorCode(HttpStatus.NOT_FOUND.value());
+        apiError.setErrorMessage("Endpoint no encontrado: " + ex.getRequestURL());
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }
 }
